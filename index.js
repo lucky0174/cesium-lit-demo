@@ -1,1 +1,2 @@
-import {MyElement} from './src/my-element.js';
+import './src/my-element.js';
+import './src/cesium-viewer.js';
