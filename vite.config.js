@@ -1,5 +1,7 @@
 import {defineConfig} from 'vite';
 import babel from 'vite-plugin-babel';
+import cesium from 'vite-plugin-cesium';
+
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,6 +16,7 @@ export default defineConfig({
         ],
       },
     }),
+    cesium(),
   ],
   build: {
     // comment-out building the lib, build dist 
