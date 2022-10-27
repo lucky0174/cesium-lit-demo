@@ -4,6 +4,11 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 
 // code from https://cesium.com/learn/cesiumjs-learn/cesiumjs-quickstart/
+// see Import from CDN vs. Install with NPM
+// see also https://www.npmjs.com/package/vite-plugin-cesium
+
+import * as Cesium from 'cesium';
+import 'cesium/Build/Cesium/Widgets/widgets.css';
 
 // Your access token can be found at: https://cesium.com/ion/tokens.
 // This is the default access token from your ion account
@@ -121,7 +126,6 @@ export class CesiumViewer extends LitElement {
   }
 
   _onClick(e) {
-    console.log(`_onClick:`, e, e.target.id);
     const factor = e.target.id === '--' ? 0.5 : 2.0;
     this.camera.setHeight(this.camera.height * factor);
     this.count++;
