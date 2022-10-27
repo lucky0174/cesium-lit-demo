@@ -6,8 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + Lit App</title>
     <script type="module" src="/index.js"></script>
+
+    <!-- Include the CesiumJS JavaScript and CSS files -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.98/Build/Cesium/Cesium.js"></script>
+    <link
+      href="https://cesium.com/downloads/cesiumjs/releases/1.98/Build/Cesium/Widgets/widgets.css"
+      rel="stylesheet" />
   </head>
   <body>
-    <my-element name="everyone"> </my-element>
+    <div style="margin: 10px">
+      <cesium-viewer></cesium-viewer>
+
+      <div id="cesiumContainer"></div>
+    </div>
   </body>
 </html>
