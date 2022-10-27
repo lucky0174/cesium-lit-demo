@@ -1,12 +1,18 @@
-# Starter template for simple Lit projects built with Vite and using decorators
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/8d7f0c01-ce5b-4766-8474-61c733fa498a/deploy-status)](https://app.netlify.com/sites/vite-lit-v2-template/deploys)
+# An attempt at the integration of Cesium with Lit components
 
-> Ready to run in dev mode, and to build and preview the site in a browser.
+Project created from [vite-lit-v2-template](https://github.com/rudifa/vite-lit-v2-template), 
+a starter template for simple Lit projects built with Vite and using decorators
 
-> Configured to use decorators @customElement, @property, @state, e.t.c.
-
-> Created with `npm create vite@latest vite-app-lit -- --template lit` and expanded by [rudifa](https://github.com/rudifa).
+> Scripts available in cesium-demo@0.0.0 via `npm run-script`:
+```
+  dev
+    vite
+  build
+    vite build
+  preview
+    vite preview
+```
 
 ### References:
 
@@ -17,3 +23,7 @@
 [Vite Getting Started](https://vitejs.dev/guide/)
 
 [Vite.js Tutorial – How to Install and Use Vite in Your Web Projects](https://www.freecodecamp.org/news/get-started-with-vite/)
+
+[CesiumJS Quickstart](https://cesium.com/learn/cesiumjs-learn/cesiumjs-quickstart/)
+
+[vite-plugin-cesium](https://www.npmjs.com/package/vite-plugin-cesium)
