@@ -1,7 +1,7 @@
 /** @prettier */
 
 import {html, css, LitElement} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import {customElement, property} from 'lit/decorators.js';
 
 // code from https://cesium.com/learn/cesiumjs-learn/cesiumjs-quickstart/
 // see Import from CDN vs. Install with NPM
@@ -17,17 +17,17 @@ Cesium.Ion.defaultAccessToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwMDY5YjNjNy05ZDZjLTQ5YjUtODBhOC03MGY4Njc3MzUyMDEiLCJpZCI6MTEyNTc3LCJpYXQiOjE2NjY4MTYyNjB9.fd9TA4pMsDaKBWE1lSEBvYB34xR-R1anLfSG-vSVI4c';
 
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
-const viewer = new Cesium.Viewer('cesiumContainer', {
-  terrainProvider: Cesium.createWorldTerrain(),
-});
+// const viewer = new Cesium.Viewer('cesiumContainer', {
+//   terrainProvider: Cesium.createWorldTerrain(),
+// });
 // Add Cesium OSM Buildings, a global 3D buildings layer.
-const buildingTileset = viewer.scene.primitives.add(
-  Cesium.createOsmBuildings()
-);
+// const buildingTileset = viewer.scene.primitives.add(
+//   Cesium.createOsmBuildings()
+// );
 
 // Fly the camera to Geneva at the given longitude, latitude, and height.
 // viewer.camera.flyTo({
-//   destination : Cesium.Cartesian3.fromDegrees(-122.4175, 37.655, 400),
+//   destination : Cesium.Cartesian3.fromDegrees(6.14569, 46.20222, 200000),
 //   orientation : {
 //     heading : Cesium.Math.toRadians(0.0),
 //     pitch : Cesium.Math.toRadians(-15.0),
@@ -49,7 +49,6 @@ const clamp = (value, min, max) => {
 
 /**
  * Camera position and orientation to fly to.
- * 
  * @requires -- a `viewer` object.
  */
 class CameraCoordinates {
@@ -66,7 +65,7 @@ class CameraCoordinates {
     this.height = clamp(height, 1000, 40_000_000);
   }
 
-  flyTo() {
+  flyTo(viewer) {
     viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(
         this.lngDeg,
@@ -85,12 +84,12 @@ class CameraCoordinates {
 /**
  * A partial encapsulation of Cesium Viewer custom controls.
  */
-@customElement('cesium-zoomer')
-export class CesiumZoomer extends LitElement {
+@customElement('cesium-viewer2')
+export class CesiumViewer extends LitElement {
   static get styles() {
     return css`
       :host {
-        display: block;
+        /* display: block; */
         border: solid 1px gray;
         padding: 10px;
         max-width: 100vw;
@@ -108,10 +107,15 @@ export class CesiumZoomer extends LitElement {
   cameraCoordinates = new CameraCoordinates();
 
   flyTo() {
-    this.cameraCoordinates.flyTo();
+    this.cameraCoordinates.flyTo(this.viewer);
   }
 
   firstUpdated() {
+    const cesiumContainer2 = this.renderRoot.getElementById('cesiumContainer2');
+    console.log(`firstUpdated cesiumContainer2:`, cesiumContainer2);
+    this.viewer = new Cesium.Viewer(cesiumContainer2, {
+      terrainProvider: Cesium.createWorldTerrain(),
+    });
     this.flyTo();
   }
 
@@ -123,6 +127,10 @@ export class CesiumZoomer extends LitElement {
         <button id="++" @click=${this._onClick} part="button">++</button>
         height: ${this.cameraCoordinates.height}
       </div>
+      <div  style="max-width: 100vw; background: blue;">div2</div>
+      <div id="cesiumContainer2" style="max-width: 100vw;">div3</div>
+      <div  style="max-width: 100vw; background: blue;">div4</div>
+      <slot></slot>
     `;
   }
 
