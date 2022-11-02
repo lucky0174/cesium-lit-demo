@@ -24,7 +24,8 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
 const buildingTileset = viewer.scene.primitives.add(
   Cesium.createOsmBuildings()
 );
-// Fly the camera to San Francisco at the given longitude, latitude, and height.
+
+// Fly the camera to Geneva at the given longitude, latitude, and height.
 // viewer.camera.flyTo({
 //   destination : Cesium.Cartesian3.fromDegrees(-122.4175, 37.655, 400),
 //   orientation : {
@@ -33,22 +34,25 @@ const buildingTileset = viewer.scene.primitives.add(
 //   }
 // });
 
-// Genève 46.20222, 6.14569
-// viewer.camera.flyTo({
-//   destination: Cesium.Cartesian3.fromDegrees(6.14569, 46.20222, 200000),
-//   orientation: {
-//     heading: Cesium.Math.toRadians(0.0),
-//     pitch: Cesium.Math.toRadians(-90.0),
-//   },
-// });
-
+/**
+ * Clamp the value to the range [min, max].
+ * @param {*} value 
+ * @param {*} min 
+ * @param {*} max 
+ * @returns -- clamped value
+ */
 const clamp = (value, min, max) => {
   if (value < min) return min;
   if (value > max) return max;
   return value;
 };
 
-class CameraPositionAndOrientation {
+/**
+ * Camera position and orientation to fly to.
+ * 
+ * @requires -- a `viewer` object.
+ */
+class CameraCoordinates {
   constructor() {
     this.lngDeg = 6.14569;
     this.latDeg = 46.20222;
@@ -56,12 +60,10 @@ class CameraPositionAndOrientation {
     this.heading = 0.0;
     this.pitch = -90.0;
     this.roll = 0.0;
-    console.log(`CameraPositionAndOrientation:`, this);
   }
 
   setHeight(height) {
     this.height = clamp(height, 1000, 40_000_000);
-    this.flyTo();
   }
 
   flyTo() {
@@ -81,10 +83,7 @@ class CameraPositionAndOrientation {
 }
 
 /**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
+ * A partial encapsulation of Cesium Viewer custom controls.
  */
 @customElement('cesium-viewer')
 export class CesiumViewer extends LitElement {
@@ -106,11 +105,14 @@ export class CesiumViewer extends LitElement {
 
   @property() name = 'Cesium';
 
-  @state() count = 0;
-  @state() camera = new CameraPositionAndOrientation();
+  cameraCoordinates = new CameraCoordinates();
+
+  flyTo() {
+    this.cameraCoordinates.flyTo();
+  }
 
   firstUpdated() {
-    this.camera.flyTo();
+    this.flyTo();
   }
 
   render() {
@@ -119,15 +121,15 @@ export class CesiumViewer extends LitElement {
       <div>
         <button id="--" @click=${this._onClick} part="button">--</button>
         <button id="++" @click=${this._onClick} part="button">++</button>
-        height: ${this.camera.height}
+        height: ${this.cameraCoordinates.height}
       </div>
-      <slot></slot>
     `;
   }
 
   _onClick(e) {
     const factor = e.target.id === '--' ? 0.5 : 2.0;
-    this.camera.setHeight(this.camera.height * factor);
-    this.count++;
+    this.cameraCoordinates.setHeight(this.cameraCoordinates.height * factor);
+    this.flyTo();
+    this.requestUpdate();
   }
 }
