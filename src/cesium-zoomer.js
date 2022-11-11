@@ -85,8 +85,8 @@ class CameraCoordinates {
 /**
  * A partial encapsulation of Cesium Viewer custom controls.
  */
-@customElement('cesium-viewer')
-export class CesiumViewer extends LitElement {
+@customElement('cesium-zoomer')
+export class CesiumZoomer extends LitElement {
   static get styles() {
     return css`
       :host {
