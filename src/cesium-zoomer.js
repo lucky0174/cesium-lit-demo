@@ -8,7 +8,11 @@ import {customElement, property} from 'lit/decorators.js';
 // see also https://www.npmjs.com/package/vite-plugin-cesium
 
 import * as Cesium from 'cesium';
-import 'cesium/Build/Cesium/Widgets/widgets.css';
+// import widgetStyles from 'cesium/Build/Cesium/Widgets/widgets.css';
+
+// not knowing how to import the widgets.css file, I just copy it into widgets.js 
+// and added the code to export the styles as css`...`
+import {widgetStyles} from './widgets.js';
 
 // Your access token can be found at: https://cesium.com/ion/tokens.
 // This is the default access token from your ion account
@@ -87,34 +91,41 @@ class CameraCoordinates {
 @customElement('cesium-viewer2')
 export class CesiumViewer extends LitElement {
   static get styles() {
-    return css`
+    return [
+      widgetStyles,
+      css`
       :host {
-        /* display: block; */
-        border: solid 1px gray;
+        /* display: block; no effect */
+        border: solid 1px red;
+        background: pink;
         padding: 10px;
         max-width: 100vw;
+        max-height: 100vw; */ /*no effect*/
         font-size: 16px;
         font-family: Helvetica, Arial, sans-serif;
-        /* box-sizing: content-box; */
+        /* box-sizing: content-box; no effect */
       }
       button {
         font-size: 14px;
       }
       #cesiumContainer2 {
+        /* width: 50%; */
         /* width: 100%; */
         /* height: 100%; */ /*does not prevent vertical growth*/
         /* max-width: 100vw; */
-        max-height: 100vh; /* prevents vertical growth, vertically incluses all widgets*/
-        width: 500px;
+        /* max-height: 100vh; prevents vertical growth, vertically incluses all widgets */
+        /* width: auto; */
+        /* height: auto; */
         /* height: 700px;*/ /*prevents vertical growth */
         background: thistle;
-        /* overflow: hidden; */ /*cuts off overlow at the bottom*/
+        /* overflow: hidden; not needed */
       }
       #separator {
         width: 100%;
         background: skyblue;
       }
-    `;
+    `,
+    ];
   }
 
   @property() name = 'Cesium';
@@ -139,6 +150,7 @@ export class CesiumViewer extends LitElement {
 
   render() {
     return html`
+
       <h3>Hello, ${this.name}!</h3>
       <div>
         <button id="--" @click=${this._onClick} part="button">--</button>
@@ -148,7 +160,7 @@ export class CesiumViewer extends LitElement {
       <div id="separator">div 1</div>
       <div id="cesiumContainer2">div 2: #cesiumContainer2</div>
       <div id="separator"">div 3</div>
-      <slot></slot>
+ 
     `;
   }
 
