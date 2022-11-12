@@ -36,9 +36,9 @@ Cesium.Ion.defaultAccessToken =
 
 /**
  * Clamp the value to the range [min, max].
- * @param {*} value 
- * @param {*} min 
- * @param {*} max 
+ * @param {*} value
+ * @param {*} min
+ * @param {*} max
  * @returns -- clamped value
  */
 const clamp = (value, min, max) => {
@@ -95,9 +95,24 @@ export class CesiumViewer extends LitElement {
         max-width: 100vw;
         font-size: 16px;
         font-family: Helvetica, Arial, sans-serif;
+        /* box-sizing: content-box; */
       }
       button {
         font-size: 14px;
+      }
+      #cesiumContainer2 {
+        /* width: 100%; */
+        /* height: 100%; */ /*does not prevent vertical growth*/
+        /* max-width: 100vw; */
+        max-height: 100vh; /* prevents vertical growth, vertically incluses all widgets*/
+        width: 500px;
+        /* height: 700px;*/ /*prevents vertical growth */
+        background: thistle;
+        /* overflow: hidden; */ /*cuts off overlow at the bottom*/
+      }
+      #separator {
+        width: 100%;
+        background: skyblue;
       }
     `;
   }
@@ -115,7 +130,10 @@ export class CesiumViewer extends LitElement {
     console.log(`firstUpdated cesiumContainer2:`, cesiumContainer2);
     this.viewer = new Cesium.Viewer(cesiumContainer2, {
       terrainProvider: Cesium.createWorldTerrain(),
+      // cesiumWidget: true,
+      // infoBox: true,
     });
+    // this.viewer.forceResize();
     this.flyTo();
   }
 
@@ -127,9 +145,9 @@ export class CesiumViewer extends LitElement {
         <button id="++" @click=${this._onClick} part="button">++</button>
         height: ${this.cameraCoordinates.height}
       </div>
-      <div  style="max-width: 100vw; background: blue;">div2</div>
-      <div id="cesiumContainer2" style="max-width: 100vw;">div3</div>
-      <div  style="max-width: 100vw; background: blue;">div4</div>
+      <div id="separator">div 1</div>
+      <div id="cesiumContainer2">div 2: #cesiumContainer2</div>
+      <div id="separator"">div 3</div>
       <slot></slot>
     `;
   }
