@@ -1,18 +1,25 @@
 /** @prettier */
 
-import {html, css, LitElement} from 'lit';
+import {html, css, unsafeCSS, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
-// code from https://cesium.com/learn/cesiumjs-learn/cesiumjs-quickstart/
-// see Import from CDN vs. Install with NPM
-// see also https://www.npmjs.com/package/vite-plugin-cesium
-
 import * as Cesium from 'cesium';
-// import widgetStyles from 'cesium/Build/Cesium/Widgets/widgets.css';
-
-// not knowing how to import the widgets.css file, I just copy it into widgets.js 
+// 1
+// not knowing how to import the widgets.css file, I just copy it into widgets.js
 // and added the code to export the styles as css`...`
+// it works
 import {widgetStyles} from './widgets.js';
+
+// 2
+// This also works, tested in dev and in build+preview
+import widgetStylesRaw from 'cesium/Build/Cesium/Widgets/widgets.css';
+const widgetStyles2 = css`
+  ${unsafeCSS(widgetStylesRaw)}
+`;
+
+console.log(`widgetStylesRaw = ${widgetStylesRaw}`);
+console.log(` widgetStyles2 = `, widgetStyles2);
+// ^^^ is a CSSResult, looks good ^^^
 
 // Your access token can be found at: https://cesium.com/ion/tokens.
 // This is the default access token from your ion account
@@ -92,7 +99,7 @@ class CameraCoordinates {
 export class CesiumViewer extends LitElement {
   static get styles() {
     return [
-      widgetStyles,
+      widgetStyles2,
       css`
       :host {
         /* display: block; no effect */
