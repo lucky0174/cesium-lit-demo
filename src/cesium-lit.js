@@ -93,10 +93,10 @@ class CameraCoordinates {
 }
 
 /**
- * A partial encapsulation of Cesium Viewer custom controls.
+ * Encapsulation of Cesium Viewer and custom controls.
  */
-@customElement('cesium-viewer2')
-export class CesiumViewer extends LitElement {
+@customElement('cesium-lit')
+export class CesiumLit extends LitElement {
   static get styles() {
     return [
       widgetStyles2,
