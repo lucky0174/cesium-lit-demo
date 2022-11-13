@@ -1,1 +1,1 @@
-import './src/cesium-zoomer.js';
+import './src/cesium-lit.js';
