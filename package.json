@@ -1,10 +1,11 @@
 {
-  "name": "cesium-demo",
-  "version": "0.0.1",
+  "name": "cesium-lit-demo",
+  "version": "0.0.2",
   "authors": [
     "Vite",
     "Lit",
-    "Rudolf Farkas @rudifa"
+    "Rudolf Farkas @rudifa",
+    "Olivier Lange @olange"
   ],
   "private": false,
   "files": [

@@ -35,8 +35,9 @@ const clamp = (value, min, max) => {
  */
 class CameraCoordinates {
   constructor() {
-    this.lngDeg = 6.14569;
-    this.latDeg = 46.20222;
+    // Pierre du Niton, Geneva, Switzerland
+    this.lngDeg = 6.15444444;
+    this.latDeg = 46.20555556;
     this.height = 200000;
     this.heading = 0.0;
     this.pitch = -90.0;
@@ -72,70 +73,150 @@ export class CesiumLit extends LitElement {
     return [
       widgetStyles,
       css`
-      :host {
-        display: block; /* no effect */
-        padding: 10px;
-        max-width: 100vw;
-        max-height: 100vw; /*no effect*/
-        font-size: 16px;
-        font-family: Helvetica, Arial, sans-serif;
-        /* box-sizing: content-box; no effect */
-      }
-      button {
-        font-size: 14px;
-      }
-      #cesiumContainer {
-        /* width: 50%; */
-        /* width: 100%; */
-        /* height: 100%; */ /*does not prevent vertical growth*/
-        /* max-width: 100vw; */
-        /* max-height: 100vh; prevents vertical growth, vertically incluses all widgets */
-        /* width: auto; */
-        /* height: auto; */
-        /* height: 700px;*/ /*prevents vertical growth */
-        background: thistle;
-        /* overflow: hidden; not needed */
-        border: solid 1px blue;
-      }
-      .lit-widgets {
-        background: hsl(0, 0%, 90%);
-        border: solid 1px blue;
-        padding: 10px;
-      }
+        :host {
+          display: block; /* no effect */
+          padding: 10px;
+          max-width: 100vw;
+          max-height: 100vw; /*no effect*/
+          font-size: 16px;
+          font-family: Helvetica, Arial, sans-serif;
+          /* box-sizing: content-box; no effect */
+        }
+        button {
+          font-size: 14px;
+        }
+        #cesiumContainer {
+          /* width: auto; */
+          /* height: auto; */
+          background: thistle;
+          border: solid 1px blue;
+        }
+        .lit-widgets {
+          background: hsl(0, 0%, 90%);
+          border: solid 1px blue;
+          padding: 10px;
+        }
 
-      .cesium-credit-lightbox-overlay {display: none; z-index: 1; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(80, 80, 80, 0.8);  }
-      .cesium-credit-lightbox {background-color: #303336; color: #ffffff; position: relative; min-height: 100px; margin: auto;  }
-      .cesium-credit-lightbox > ul > li a, .cesium-credit-lightbox > ul > li a:visited {color: #ffffff;  }
-      .cesium-credit-lightbox > ul > li a:hover {color: #48b;  }
-      .cesium-credit-lightbox.cesium-credit-lightbox-expanded {border: 1px solid #444; border-radius: 5px; max-width: 370px;  }
-      .cesium-credit-lightbox.cesium-credit-lightbox-mobile {height: 100%; width: 100%;  }
-      .cesium-credit-lightbox-title {padding: 20px 20px 0 20px;  }
-      .cesium-credit-lightbox-close {font-size: 18pt; cursor: pointer; position: absolute; top: 0; right: 6px; color: #ffffff;  }
-      .cesium-credit-lightbox-close:hover {color: #48b;  }
-      .cesium-credit-lightbox > ul {margin: 0; padding: 12px 20px 12px 40px; font-size: 13px;  }
-      .cesium-credit-lightbox > ul > li {padding-bottom: 6px;  }
-      .cesium-credit-lightbox > ul > li * {padding: 0; margin: 0;  }
-      .cesium-credit-expand-link {padding-left: 5px; cursor: pointer; text-decoration: underline; color: #ffffff;  }
-      .cesium-credit-expand-link:hover {color: #48b;  }
-      .cesium-credit-text {color: #ffffff;  }
-      .cesium-credit-textContainer *, .cesium-credit-logoContainer * {display: inline;  }
+        /* add styles for the credit-lightbox overlay */
 
-      .cesium-animation-rectButton .cesium-animation-buttonGlow { filter: url(#animation_blurred); }
-      .cesium-animation-rectButton .cesium-animation-buttonMain { fill: url(#animation_buttonNormal); }
-      .cesium-animation-buttonToggled .cesium-animation-buttonMain { fill: url(#animation_buttonToggled); }
-      .cesium-animation-rectButton:hover .cesium-animation-buttonMain { fill: url(#animation_buttonHovered); }
-      .cesium-animation-buttonDisabled .cesium-animation-buttonMain { fill: url(#animation_buttonDisabled); }
-      .cesium-animation-shuttleRingG .cesium-animation-shuttleRingSwoosh { fill: url(#animation_shuttleRingSwooshGradient); }
-      .cesium-animation-shuttleRingG:hover .cesium-animation-shuttleRingSwoosh { fill: url(#animation_shuttleRingSwooshHovered); }
-      .cesium-animation-shuttleRingPointer { fill: url(#animation_shuttleRingPointerGradient); }
-      .cesium-animation-shuttleRingPausePointer { fill: url(#animation_shuttleRingPointerPaused); }
-      .cesium-animation-knobOuter { fill: url(#animation_knobOuter); }
-      .cesium-animation-knobInner { fill: url(#animation_knobInner); }
-    `,
+        .cesium-credit-lightbox-overlay {
+          display: none;
+          z-index: 1;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(80, 80, 80, 0.8);
+        }
+        .cesium-credit-lightbox {
+          background-color: #303336;
+          color: #ffffff;
+          position: relative;
+          min-height: 100px;
+          margin: auto;
+        }
+        .cesium-credit-lightbox > ul > li a,
+        .cesium-credit-lightbox > ul > li a:visited {
+          color: #ffffff;
+        }
+        .cesium-credit-lightbox > ul > li a:hover {
+          color: #48b;
+        }
+        .cesium-credit-lightbox.cesium-credit-lightbox-expanded {
+          border: 1px solid #444;
+          border-radius: 5px;
+          max-width: 370px;
+        }
+        .cesium-credit-lightbox.cesium-credit-lightbox-mobile {
+          height: 100%;
+          width: 100%;
+        }
+        .cesium-credit-lightbox-title {
+          padding: 20px 20px 0 20px;
+        }
+        .cesium-credit-lightbox-close {
+          font-size: 18pt;
+          cursor: pointer;
+          position: absolute;
+          top: 0;
+          right: 6px;
+          color: #ffffff;
+        }
+        .cesium-credit-lightbox-close:hover {
+          color: #48b;
+        }
+        .cesium-credit-lightbox > ul {
+          margin: 0;
+          padding: 12px 20px 12px 40px;
+          font-size: 13px;
+        }
+        .cesium-credit-lightbox > ul > li {
+          padding-bottom: 6px;
+        }
+        .cesium-credit-lightbox > ul > li * {
+          padding: 0;
+          margin: 0;
+        }
+        .cesium-credit-expand-link {
+          padding-left: 5px;
+          cursor: pointer;
+          text-decoration: underline;
+          color: #ffffff;
+        }
+        .cesium-credit-expand-link:hover {
+          color: #48b;
+        }
+        .cesium-credit-text {
+          color: #ffffff;
+        }
+        .cesium-credit-textContainer *,
+        .cesium-credit-logoContainer * {
+          display: inline;
+        }
+
+        .cesium-animation-rectButton .cesium-animation-buttonGlow {
+          filter: url(#animation_blurred);
+        }
+        .cesium-animation-rectButton .cesium-animation-buttonMain {
+          fill: url(#animation_buttonNormal);
+        }
+        .cesium-animation-buttonToggled .cesium-animation-buttonMain {
+          fill: url(#animation_buttonToggled);
+        }
+        .cesium-animation-rectButton:hover .cesium-animation-buttonMain {
+          fill: url(#animation_buttonHovered);
+        }
+        .cesium-animation-buttonDisabled .cesium-animation-buttonMain {
+          fill: url(#animation_buttonDisabled);
+        }
+        .cesium-animation-shuttleRingG .cesium-animation-shuttleRingSwoosh {
+          fill: url(#animation_shuttleRingSwooshGradient);
+        }
+        .cesium-animation-shuttleRingG:hover
+          .cesium-animation-shuttleRingSwoosh {
+          fill: url(#animation_shuttleRingSwooshHovered);
+        }
+        .cesium-animation-shuttleRingPointer {
+          fill: url(#animation_shuttleRingPointerGradient);
+        }
+        .cesium-animation-shuttleRingPausePointer {
+          fill: url(#animation_shuttleRingPointerPaused);
+        }
+        .cesium-animation-knobOuter {
+          fill: url(#animation_knobOuter);
+        }
+        .cesium-animation-knobInner {
+          fill: url(#animation_knobInner);
+        }
+      `,
     ];
   }
 
-  @property() name = 'Cesium';
+  cesiumMeetsLit = html`<h3>
+    <a href="https://cesium.com/platform/cesiumjs/">Cesium</a> meets
+    <a href="https://lit.dev/">Lit</a>
+  </h3>`;
 
   cameraCoordinates = new CameraCoordinates();
 
@@ -155,7 +236,7 @@ export class CesiumLit extends LitElement {
   render() {
     return html`
       <div class="lit-widgets">
-        <h3>Hello, ${this.name}!</h3>
+        ${this.cesiumMeetsLit}
         <button id="--" @click=${this._onClick} part="button">--</button>
         <button id="++" @click=${this._onClick} part="button">++</button>
         &nbsp; height: ${this.cameraCoordinates.height} m
