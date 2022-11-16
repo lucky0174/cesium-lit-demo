@@ -1,7 +1,7 @@
 /** @prettier */
 
 import {html, css, unsafeCSS, LitElement} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
+import {customElement} from 'lit/decorators.js';
 
 import * as Cesium from 'cesium';
 
@@ -45,7 +45,7 @@ class CameraCoordinates {
   }
 
   setHeight(height) {
-    this.height = clamp(height, 1000, 40_000_000);
+    this.height = clamp(height, 1000, 32_768_000);
   }
 
   flyTo(viewer) {
