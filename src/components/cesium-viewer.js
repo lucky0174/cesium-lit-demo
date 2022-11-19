@@ -1,7 +1,7 @@
 /** @prettier */
 
 import {html, css, unsafeCSS, LitElement} from 'lit';
-import {customElement} from 'lit/decorators.js';
+import {customElement, property, state} from 'lit/decorators.js';
 
 import * as Cesium from 'cesium';
 
@@ -15,7 +15,6 @@ import creditDisplayCssRaw from './cesium-credit-display.css';
 const creditDisplayCss = css`
   ${unsafeCSS(creditDisplayCssRaw)}
 `;
-
 
 // Your access token can be found at: https://cesium.com/ion/tokens.
 // This is the default access token from the cesiumjs-quickstart demo
@@ -55,7 +54,7 @@ class CameraCoordinates {
   }
 
   flyTo(viewer) {
-    viewer.camera.flyTo({
+    viewer?.camera?.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(
         this.lngDeg,
         this.latDeg,
@@ -71,10 +70,10 @@ class CameraCoordinates {
 }
 
 /**
- * Encapsulation of Cesium Viewer and custom controls.
+ * Encapsulation of Cesium.Viewer.
  */
-@customElement('cesium-lit')
-export class CesiumLit extends LitElement {
+@customElement('cesium-viewer')
+export class CesiumViewer extends LitElement {
   static get styles() {
     return [
       widgetsCss,
@@ -89,62 +88,66 @@ export class CesiumLit extends LitElement {
           font-family: Helvetica, Arial, sans-serif;
           /* box-sizing: content-box; no effect */
         }
-        button {
-          font-size: 14px;
-        }
         #cesiumContainer {
           /* width: auto; */
           /* height: auto; */
           background: thistle;
           border: solid 1px blue;
         }
-        .lit-widgets {
-          background: hsl(0, 0%, 90%);
-          border: solid 1px blue;
-          padding: 10px;
-        }
-
- 
       `,
     ];
   }
 
-  cesiumMeetsLit = html`<h3>
-    <a href="https://cesium.com/platform/cesiumjs/">Cesium</a> meets
-    <a href="https://lit.dev/">Lit</a>
-  </h3>`;
+  @property({type: Boolean}) homeButton = false;
+  @property({type: Boolean}) helpButton = false;
+
+  @property({type: Number}) height = 1000000;
+  set height(val) {
+    let oldVal = this._height;
+    this._height = val;
+    this.requestUpdate('height', oldVal);
+    console.log(
+      `--- set height: ${val}`,
+      `cameraCoordinates: ${this.cameraCoordinates}`
+    );
+
+    this.cameraCoordinates?.setHeight(this.height);
+    this.cameraCoordinates?.flyTo(this.viewer);
+  }
+  get height() {
+    return this._height;
+  }
 
   cameraCoordinates = new CameraCoordinates();
 
   flyTo() {
+    console.log(`--- flyTo: ${this.cameraCoordinates.height}`);
     this.cameraCoordinates.flyTo(this.viewer);
   }
 
   firstUpdated() {
     const cesiumContainer = this.renderRoot.getElementById('cesiumContainer');
     console.log(`firstUpdated cesiumContainer:`, cesiumContainer);
+    console.log(`firstUpdated this,homeButton:`, this.homeButton);
     this.viewer = new Cesium.Viewer(cesiumContainer, {
       terrainProvider: Cesium.createWorldTerrain(),
+      //animation: false,
+      homeButton: this.homeButton,
+      navigationHelpButton: this.helpButton,
     });
     this.flyTo();
   }
 
-  render() {
-    return html`
-      <div class="lit-widgets">
-        ${this.cesiumMeetsLit}
-        <button id="--" @click=${this._onClick} part="button">--</button>
-        <button id="++" @click=${this._onClick} part="button">++</button>
-        &nbsp; height: ${this.cameraCoordinates.height} m
-      </div>
-      <div id="cesiumContainer"></div>
-    `;
+  shouldUpdate(changedProperties) {
+    console.log(`--- shouldUpdate:`, changedProperties);
+    // this.cameraCoordinates.setHeight(this.cameraCoordinates.height * 2);
+    return true;
   }
 
-  _onClick(e) {
-    const factor = e.target.id === '--' ? 0.5 : 2.0;
-    this.cameraCoordinates.setHeight(this.cameraCoordinates.height * factor);
-    this.flyTo();
-    this.requestUpdate();
+  render() {
+    console.log(`--- render this.homeButton:`, this.homeButton);
+    console.log(`--- render this.helpButton:`, this.helpButton);
+    console.log(`--- render this.height:`, this.height);
+    return html` <div id="cesiumContainer"></div> `;
   }
 }

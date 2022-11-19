@@ -1,1 +1,2 @@
-import './src/cesium-lit.js';
+
+import  './src/app/demo-app.js';
