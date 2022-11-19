@@ -49,6 +49,17 @@ class CameraCoordinates {
     this.roll = 0.0;
   }
 
+  // update this from an object specifying some or all of the properties
+  update(obj) {
+    console.log(`--- update:`, obj);
+    this.lngDeg = obj.lngDeg ?? this.lngDeg;
+    this.latDeg = obj.latDeg ?? this.latDeg;
+    this.height = obj.height ?? this.height;
+    this.heading = obj.heading ?? this.heading;
+    this.pitch = obj.pitch ?? this.pitch;
+    this.roll = obj.roll ?? this.roll;
+  }
+
   setHeight(height) {
     this.height = clamp(height, 1000, 32_768_000);
   }
@@ -116,6 +127,19 @@ export class CesiumViewer extends LitElement {
   }
   get height() {
     return this._height;
+  }
+
+  @property({type: String}) cameraCoordinatesJson = "{}";
+  set cameraCoordinatesJson(val) {
+    let oldVal = this._cameraCoordinatesJson;
+    this._cameraCoordinatesJson = val;
+    this.requestUpdate('cameraCoordinatesJson', oldVal);
+    console.log(`--- set cameraCoordinatesJson: ${val}`);
+    this.cameraCoordinates?.update(JSON.parse(val));
+    this.cameraCoordinates?.flyTo(this.viewer);
+  }
+  get cameraCoordinatesJson() {
+    return this._cameraCoordinatesJson;
   }
 
   cameraCoordinates = new CameraCoordinates();

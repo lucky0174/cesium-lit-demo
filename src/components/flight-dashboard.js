@@ -16,7 +16,8 @@ const clamp = (value, min, max) => {
   return value;
 };
 
-class TestElement extends LitElement {
+@customElement('flight-dashboard')
+class FlightDashboard extends LitElement {
   static get properties() {
     return {
       countries: {
@@ -28,20 +29,36 @@ class TestElement extends LitElement {
   constructor() {
     super();
 
+    const geneva = JSON.stringify({
+      lngDeg: 6.15444444,
+      latDeg: 46.20555556,
+      height: 10000,
+      pitch: -90,
+    });
+    const zermatt = JSON.stringify({
+      lngDeg: 7.74912,
+      latDeg: 46.02126,
+      height: 2200,
+      heading: 230,
+      pitch: 10,
+    });
+    const philadelphia = JSON.stringify({
+      lngDeg: -75.165222,
+      latDeg: 39.952583,
+      height: 20000,
+      pitch: -90,
+    });
+
     this.config = {
       id: 'configuration',
-      options: ['', 'homeButton', 'helpButton', 'homeButton helpButton'],
+      options: [geneva, , zermatt, philadelphia],
     };
   }
 
-  // https://stackoverflow.com/questions/55859715/how-to-set-checked-attribute-to-radio-in-litelement
-
-  // todo: add event listener to radio buttons
-
-  radiobuttonstring = ``;
+  radiobuttonstring = `{}`; // valid JSON
 
   onChange(e) {
-    console.log('ttt onChange e.target.value:', e.target.value);
+    console.log('flight-dashboard onChange e.target.value:', e.target.value);
 
     // set radiobuttonstring to the selected radio button value
     this.radiobuttonstring = e.target.value;
@@ -53,14 +70,15 @@ class TestElement extends LitElement {
 
   setHeight(height) {
     this.height = clamp(height, 1000, 32_768_000);
-    // this.requestUpdate();
   }
 
   render() {
     const homeButton = this.radiobuttonstring.includes('homeButton');
     const helpButton = this.radiobuttonstring.includes('helpButton');
+    const camCoords = this.radiobuttonstring;
+
     console.log(
-      `ttt render this.radiobuttonstring:`,
+      `flight-dashboard render this.radiobuttonstring:`,
       this.radiobuttonstring,
       homeButton,
       helpButton,
@@ -70,7 +88,7 @@ class TestElement extends LitElement {
     const config = this.config;
     return html`
       <fieldset>
-        <legend>${config.id}</legend>
+        <legend>Fly and see</legend>
         <form>
           ${config.options.map(
             (option) => html`
@@ -89,26 +107,27 @@ class TestElement extends LitElement {
         </form>
       </fieldset>
       <fieldset>
-        <button id="--" @click=${this._onClick} part="button">--</button>
-        <button id="++" @click=${this._onClick} part="button">++</button>
+        <legend>Geneva</legend>
+        <button id="--" @click=${this._clickIncrementHeight} part="button">
+          --
+        </button>
+        <button id="++" @click=${this._clickIncrementHeight} part="button">
+          ++
+        </button>
         &nbsp; height: ${this.height} m
       </fieldset>
-      <div
-        style="border: 1px solid blue; width: 90%;">
-        <p>instantiated in test-element.js</p>
+      <div style="border: 1px solid blue; width: 100%;">
+        <p>instantiated in flight-dashboard.js</p>
         <cesium-viewer
-          ?homeButton=${homeButton}
-          ?helpButton=${helpButton}
-          .height=${this.height}>
+          .height=${this.height}
+          .cameraCoordinatesJson=${camCoords}>
         </cesium-viewer>
       </div>
     `;
   }
 
-  _onClick(e) {
+  _clickIncrementHeight(e) {
     const factor = e.target.id === '--' ? 0.5 : 2.0;
     this.setHeight(this.height * factor);
   }
 }
-
-customElements.define('test-element', TestElement);
