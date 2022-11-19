@@ -1,6 +1,3 @@
-
-/** @prettier */
-
 import {html, css, LitElement} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 
@@ -28,7 +25,7 @@ export class MyElement extends LitElement {
   }
 
   @property() name = 'World';
-  @property({type: Boolean}) ok = false; 
+  @property({type: Boolean}) ok = false;
   @property({type: Boolean}) also = false;
 
   @state() count = 0;
@@ -36,7 +33,7 @@ export class MyElement extends LitElement {
   render() {
     return html`
       <h1>Hello, ${this.name}!</h1>
-      <p>ok ${this.ok}  also ${this.also}</p>
+      <p>ok ${this.ok} also ${this.also}</p>
       <button @click=${this._onClick} part="button">
         Click Count: ${this.count}
       </button>
