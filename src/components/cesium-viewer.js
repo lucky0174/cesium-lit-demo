@@ -51,7 +51,7 @@ class CameraCoordinates {
 
   // update this from an object specifying some or all of the properties
   update(obj) {
-    console.log(`--- update:`, obj);
+    console.log(`CameraCoordinates update:`, obj);
     this.lngDeg = obj.lngDeg ?? this.lngDeg;
     this.latDeg = obj.latDeg ?? this.latDeg;
     this.height = obj.height ?? this.height;
@@ -109,6 +109,10 @@ export class CesiumViewer extends LitElement {
     ];
   }
 
+  // API exposed to the parent
+
+  @property({type: Object}) cameraCoords = {};
+
   @property({type: Boolean}) homeButton = false;
   @property({type: Boolean}) helpButton = false;
 
@@ -127,19 +131,6 @@ export class CesiumViewer extends LitElement {
   }
   get height() {
     return this._height;
-  }
-
-  @property({type: String}) cameraCoordinatesJson = "{}";
-  set cameraCoordinatesJson(val) {
-    let oldVal = this._cameraCoordinatesJson;
-    this._cameraCoordinatesJson = val;
-    this.requestUpdate('cameraCoordinatesJson', oldVal);
-    console.log(`--- set cameraCoordinatesJson: ${val}`);
-    this.cameraCoordinates?.update(JSON.parse(val));
-    this.cameraCoordinates?.flyTo(this.viewer);
-  }
-  get cameraCoordinatesJson() {
-    return this._cameraCoordinatesJson;
   }
 
   cameraCoordinates = new CameraCoordinates();
@@ -163,15 +154,25 @@ export class CesiumViewer extends LitElement {
   }
 
   shouldUpdate(changedProperties) {
-    console.log(`--- shouldUpdate:`, changedProperties);
+    console.log(`cesium-viewer shouldUpdate:`, changedProperties);
     // this.cameraCoordinates.setHeight(this.cameraCoordinates.height * 2);
     return true;
   }
+  willUpdate(changedProperties) {
+    console.log(`cesium-viewer willUpdate:`, changedProperties);
+    if (changedProperties.has('cameraCoords')) {
+      // update cameraCordinates from cameraCoords
+
+      this.cameraCoordinates.update(this.cameraCoords);
+      this.flyTo();
+      // this.requestUpdate();
+    }
+  }
 
   render() {
-    console.log(`--- render this.homeButton:`, this.homeButton);
-    console.log(`--- render this.helpButton:`, this.helpButton);
-    console.log(`--- render this.height:`, this.height);
+    // console.log(`--- render this.homeButton:`, this.homeButton);
+    // console.log(`--- render this.helpButton:`, this.helpButton);
+    // console.log(`--- render this.height:`, this.height);
     return html` <div id="cesiumContainer"></div> `;
   }
 }

@@ -29,111 +29,131 @@ class FlightDashboard extends LitElement {
   constructor() {
     super();
 
-    const geneva = JSON.stringify({
-      lngDeg: 6.15444444,
-      latDeg: 46.20555556,
-      height: 10000,
-      pitch: -90,
-    });
-    const zermatt = JSON.stringify({
-      lngDeg: 7.74912,
-      latDeg: 46.02126,
-      height: 2200,
-      heading: 230,
-      pitch: 10,
-    });
-    const philadelphia = JSON.stringify({
-      lngDeg: -75.165222,
-      latDeg: 39.952583,
-      height: 20000,
-      pitch: -90,
-    });
+    // data for the child component
 
-    this.config = {
-      id: 'configuration',
-      options: [geneva, zermatt, philadelphia],
-    };
+    this.cameraPlaces = [
+      {
+        name: 'Geneva',
+        lngDeg: 6.15444444,
+        latDeg: 46.20555556,
+        height: 10000,
+        heading: 0,
+        pitch: -90,
+        roll: 0,
+      },
+      {
+        name: 'Zermatt',
+        lngDeg: 7.73888889,
+        latDeg: 46.02055556,
+        height: 2200,
+        heading: 230,
+        pitch: 10,
+        roll: 0,
+      },
+      {
+        name: 'Philadelphia',
+        lngDeg: -75.165222,
+        latDeg: 39.952583,
+        height: 20000,
+        heading: 0,
+        pitch: -90,
+        roll: 0,
+      },
+    ];
   }
 
-  radiobuttonstring = `{}`; // valid JSON
-
-  onChangeConfig(e) {
-    console.log('flight-dashboard onChange e.target.value:', e.target.value);
-
-    // set radiobuttonstring to the selected radio button value
-    this.radiobuttonstring = e.target.value;
-    this.requestUpdate();
-  }
+  @state()
+  selectedPlace = {};
 
   @state()
   height = 800000;
 
   setHeight(height) {
     this.height = clamp(height, 1000, 32_768_000);
-    this.radiobuttonstring = this.config.options[0]; // geneva
   }
 
+  // render fragments and render
+
+  _renderRadioButtons = () => {
+    return html`
+      <fieldset>
+        <legend>Fly and see</legend>
+        <form>
+          ${this.cameraPlaces.map(
+            (option) => html`
+              <input
+                id="provider-send-${option.name}"
+                name="radio-name"
+                type="radio"
+                class="form-check-input"
+                value="${option.name}"
+                ?checked=${option.name === this.cameraPlaces[0].name}
+                @change=${this._onChangePlace} />
+              <label class="form-check-label">${JSON.stringify(option)}</label>
+              <br />
+            `
+          )}
+        </form>
+      </fieldset>
+    `;
+  };
+
+  _renderButtons = () => {
+    return html`
+      <fieldset>
+        <legend>Geneva</legend>
+        <button id="--" @click=${this._clickIncrementHeight} part="button">
+          --
+        </button>
+        <button id="++" @click=${this._clickIncrementHeight} part="button">
+          ++
+        </button>
+        &nbsp; height: ${this.height} m
+      </fieldset>
+    `;
+  };
+
+  _renderCesiumViewer = () => {
+    return html`
+      <div style="border: 1px solid blue; ">
+        <p>
+          &nbsp;&lt;cesium-viewer&gt; &nbsp;&lt;/cesium-viewer&gt; instantiated
+          in flight-dashboard.js
+        </p>
+        <cesium-viewer
+          .height=${this.height}
+          .cameraCoords=${this.selectedPlace}></cesium-viewer>
+      </div>
+    `;
+  };
+
   render() {
-    const homeButton = this.radiobuttonstring.includes('homeButton');
-    const helpButton = this.radiobuttonstring.includes('helpButton');
-    const camCoords = this.radiobuttonstring;
+    console.log('flight-dashboard render', this.selectedPlace);
 
-    console.log(
-      `flight-dashboard render.`,
-      this.radiobuttonstring,
-      homeButton,
-      helpButton,
-      this.height
-    );
-
-    const config = this.config;
     return html`
       <div style="border: 1px solid blue;  padding: 5px">
-        <fieldset>
-          <legend>Fly and see</legend>
-          <form>
-            ${config.options.map(
-              (option) => html`
-                <input
-                  id="provider-send-${option}"
-                  name="sending-${config.id}"
-                  type="radio"
-                  class="form-check-input"
-                  value="${option}"
-                  ?checked=${option === this.config.options[0]}
-                  @change=${this.onChangeConfig} />
-                <label class="form-check-label">${option}</label>
-                <br />
-              `
-            )}
-          </form>
-        </fieldset>
-        <fieldset>
-          <legend>Geneva</legend>
-          <button id="--" @click=${this._clickIncrementHeight} part="button">
-            --
-          </button>
-          <button id="++" @click=${this._clickIncrementHeight} part="button">
-            ++
-          </button>
-          &nbsp; height: ${this.height} m
-        </fieldset>
-        <div style="border: 1px solid blue; ">
-          <p>
-            &nbsp;&lt;cesium-viewer&gt; &nbsp;&lt;/cesium-viewer&gt;
-            instantiated in flight-dashboard.js
-          </p>
-          <cesium-viewer
-            .height=${this.height}
-            .cameraCoordinatesJson=${camCoords}>
-          </cesium-viewer>
-        </div>
+        ${this._renderRadioButtons()} ${this._renderButtons()}
+        ${this._renderCesiumViewer()}
       </div>
     `;
   }
 
+  // listeners
+
   _clickIncrementHeight(e) {
+    // select Geneva if not selected
+    if (this.selectedPlace.name !== this.cameraPlaces[0].name) {
+      this.selectedPlace = this.cameraPlaces[0];
+    }
     const factor = e.target.id === '--' ? 0.5 : 2.0;
     this.setHeight(this.height * factor);
+  }
+
+  _onChangePlace(e) {
+    const place = this.cameraPlaces.find(
+      (place) => place.name === e.target.value
+    );
+    console.log('flight-dashboard _onChangePlace:', place);
+    this.selectedPlace = place;
   }
 }
