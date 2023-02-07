@@ -1,11 +1,9 @@
 import {LitElement, html} from 'lit';
-import {customElement} from 'lit/decorators.js';
 
 import '../components/cesium-viewer.js';
 import '../components/my-element.js';
 import '../components/flight-dashboard.js';
 
-@customElement('demo-app')
 export class DemoApp extends LitElement {
   about = html`
     <div>
@@ -29,10 +27,9 @@ export class DemoApp extends LitElement {
               >deployed</a
             >
           </li>
-          <li> by
-            <a href="https://github.com/rudifa/" target="_blank"
-              >rudifa</a
-            >
+          <li>
+            by
+            <a href="https://github.com/rudifa/" target="_blank">rudifa</a>
           </li>
         </ul>
       </fieldset>
@@ -51,3 +48,5 @@ export class DemoApp extends LitElement {
     `;
   }
 }
+
+window.customElements.define('demo-app', DemoApp);
