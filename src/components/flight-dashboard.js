@@ -42,6 +42,15 @@ class FlightDashboard extends LitElement {
         roll: 0,
       },
       {
+        name: 'Ecublens',
+        lngDeg: 6.56362,
+        latDeg: 46.52474,
+        height: 1000,
+        heading: 0,
+        pitch: -90,
+        roll: 0,
+      },
+      {
         name: 'Zermatt',
         lngDeg: 7.73888889,
         latDeg: 46.02055556,
