@@ -1,5 +1,4 @@
 import {LitElement, html} from 'lit-element';
-import {customElement, property, state} from 'lit/decorators.js';
 
 import './cesium-viewer.js';
 
@@ -16,12 +15,17 @@ const clamp = (value, min, max) => {
   return value;
 };
 
-@customElement('flight-dashboard')
-class FlightDashboard extends LitElement {
+export class FlightDashboard extends LitElement {
   static get properties() {
     return {
       countries: {
         type: Array,
+      },
+      selectedPlace: {
+        type: Object,
+      },
+      height: {
+        type: Number,
       },
     };
   }
@@ -69,13 +73,9 @@ class FlightDashboard extends LitElement {
         roll: 0,
       },
     ];
+    this.selectedPlace = {};
+    this.height = 64000;
   }
-
-  @state()
-  selectedPlace = {};
-
-  @state()
-  height = 800000;
 
   setHeight(height) {
     this.height = clamp(height, 1000, 32_768_000);
@@ -166,3 +166,5 @@ class FlightDashboard extends LitElement {
     this.selectedPlace = place;
   }
 }
+
+window.customElements.define('flight-dashboard', FlightDashboard);

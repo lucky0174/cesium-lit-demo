@@ -1,7 +1,6 @@
 /** @prettier */
 
 import {html, css, unsafeCSS, LitElement} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
 
 import * as Cesium from 'cesium';
 
@@ -82,7 +81,6 @@ class CameraCoordinates {
 /**
  * Encapsulation of Cesium.Viewer.
  */
-@customElement('cesium-viewer')
 export class CesiumViewer extends LitElement {
   static get styles() {
     return [
@@ -108,14 +106,23 @@ export class CesiumViewer extends LitElement {
     ];
   }
 
-  // API exposed to the parent
+  static get properties() {
+    return {
+      cameraCoords: {type: Object},
+      homeButton: {type: Boolean},
+      helpButton: {type: Boolean},
+      height: {type: Number},
+    };
+  }
 
-  @property({type: Object}) cameraCoords = {};
+  constructor() {
+    super();
+    this.cameraCoords = {};
+    this.homeButton = false;
+    this.helpButton = false;
+    this.height = 1000000;
+  }
 
-  @property({type: Boolean}) homeButton = false;
-  @property({type: Boolean}) helpButton = false;
-
-  @property({type: Number}) height = 1000000;
   set height(val) {
     let oldVal = this._height;
     this._height = val;
@@ -175,3 +182,5 @@ export class CesiumViewer extends LitElement {
     return html` <div id="cesiumContainer"></div> `;
   }
 }
+
+window.customElements.define('cesium-viewer', CesiumViewer);
