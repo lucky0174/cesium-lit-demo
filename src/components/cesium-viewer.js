@@ -17,7 +17,6 @@ const creditDisplayCss = css`
 `;
 
 // Your access token can be found at: https://cesium.com/ion/tokens.
-// This is the default access token from the cesiumjs-quickstart demo
 Cesium.Ion.defaultAccessToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwMDY5YjNjNy05ZDZjLTQ5YjUtODBhOC03MGY4Njc3MzUyMDEiLCJpZCI6MTEyNTc3LCJpYXQiOjE2NjY4MTYyNjB9.fd9TA4pMsDaKBWE1lSEBvYB34xR-R1anLfSG-vSVI4c';
 
