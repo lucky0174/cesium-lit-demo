@@ -58,6 +58,20 @@ class CameraCoordinates {
     this.roll = obj.roll ?? this.roll;
   }
 
+  static from(camera) {
+    if (!camera) return undefined;
+    const coords = new CameraCoordinates();
+    coords.lngDeg = Cesium.Math.toDegrees(
+      camera.positionCartographic.longitude
+    );
+    coords.latDeg = Cesium.Math.toDegrees(camera.positionCartographic.latitude);
+    coords.height = camera.positionCartographic.height;
+    coords.heading = Cesium.Math.toDegrees(camera.heading);
+    coords.pitch = Cesium.Math.toDegrees(camera.pitch);
+    coords.roll = Cesium.Math.toDegrees(camera.roll);
+    return coords;
+  }
+
   setHeight(height) {
     this.height = clamp(height, 1000, 32_768_000);
   }
@@ -112,6 +126,7 @@ export class CesiumViewer extends LitElement {
       homeButton: {type: Boolean},
       helpButton: {type: Boolean},
       height: {type: Number},
+      cameraQuery: {type: Number},
     };
   }
 
@@ -121,6 +136,7 @@ export class CesiumViewer extends LitElement {
     this.homeButton = false;
     this.helpButton = false;
     this.height = 1000000;
+    this.cameraQuery = 0;
   }
 
   set height(val) {
@@ -139,10 +155,23 @@ export class CesiumViewer extends LitElement {
     return this._height;
   }
 
+  set cameraQuery(val) {
+    // get camera coordinates and send them to the parent via the event
+    const coords = CameraCoordinates.from(this.viewer?.camera);
+    // console.log(`--- cameraQuery: ${val}`, `cameraCoordinates:`, coords);
+    this.dispatchEvent(
+      new CustomEvent('camera-query', {
+        detail: coords,
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   cameraCoordinates = new CameraCoordinates();
 
   flyTo() {
-    console.log(`--- flyTo: ${this.cameraCoordinates.height}`);
+    // console.log(`--- flyTo: ${this.cameraCoordinates.height}`);
     this.cameraCoordinates.flyTo(this.viewer);
   }
 
@@ -156,19 +185,24 @@ export class CesiumViewer extends LitElement {
       homeButton: this.homeButton,
       navigationHelpButton: this.helpButton,
     });
+    this.viewer.camera.moveEnd.addEventListener( () => {
+        console.log(`camera stopped moving`, this);
+        // send custom event to parent
+        this.cameraQuery = -1;
+    });
     this.flyTo();
   }
 
   shouldUpdate(changedProperties) {
-    console.log(`cesium-viewer shouldUpdate:`, changedProperties);
+    // console.log(`cesium-viewer shouldUpdate:`, changedProperties);
     // this.cameraCoordinates.setHeight(this.cameraCoordinates.height * 2);
     return true;
   }
+
   willUpdate(changedProperties) {
-    console.log(`cesium-viewer willUpdate:`, changedProperties);
+    // console.log(`cesium-viewer willUpdate:`, changedProperties);
     if (changedProperties.has('cameraCoords')) {
       // update cameraCordinates from cameraCoords
-
       this.cameraCoordinates.update(this.cameraCoords);
       this.flyTo();
       // this.requestUpdate();
@@ -176,9 +210,9 @@ export class CesiumViewer extends LitElement {
   }
 
   render() {
-    // console.log(`--- render this.homeButton:`, this.homeButton);
-    // console.log(`--- render this.helpButton:`, this.helpButton);
-    // console.log(`--- render this.height:`, this.height);
+    // console.log(`--- render this.viewer:`, this.viewer);
+    // console.log(`--- render viewer.camera:`, this.viewer?.camera);
+
     return html` <div id="cesiumContainer"></div> `;
   }
 }
