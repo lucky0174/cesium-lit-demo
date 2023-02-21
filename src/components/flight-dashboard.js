@@ -18,15 +18,6 @@ const clamp = (value, min, max) => {
 export class FlightDashboard extends LitElement {
   static get properties() {
     return {
-    //   countries: {
-    //     type: Array,
-    //   },
-    //   selectedPlace: {
-    //     type: Object,
-    //   },
-    //   height: {
-    //     type: Number,
-    //   },
       cameraQuery: {
         type: Number,
       },
@@ -38,8 +29,6 @@ export class FlightDashboard extends LitElement {
 
   constructor() {
     super();
-
-    // data for the child component
 
     this.cameraPlaces = [
       {
@@ -63,7 +52,7 @@ export class FlightDashboard extends LitElement {
       {
         name: 'Grand Combin',
         lngDeg: 7.286978,
-        latDeg: 46.025880,
+        latDeg: 46.02588,
         height: 3902,
         heading: 178,
         pitch: -5.294,
@@ -89,8 +78,25 @@ export class FlightDashboard extends LitElement {
       },
     ];
     this.currentPlace = this.cameraPlaces[0];
-    // this.height = 1000;
     this.cameraQuery = 0;
+  }
+
+  // formatter for the camera coordinates
+
+  stringifyPlace(place) {
+    return JSON.stringify(place, (key, value) => {
+      if (value.toFixed === undefined) return value;
+      switch (key) {
+        case 'lngDeg':
+        case 'latDeg':
+          return value.toFixed(6);
+        case 'height':
+        case 'heading':
+        case 'pitch':
+        case 'roll':
+          return value.toFixed(0);
+      }
+    });
   }
 
   // render fragments and render
@@ -134,7 +140,7 @@ export class FlightDashboard extends LitElement {
           <button id="?" @click=${this._clickCameraQuery} part="button">
             ?
           </button>
-          <span>${JSON.stringify(this.currentPlace)}</span>
+          <span>${this.stringifyPlace(this.currentPlace)}</span>
         </p>
       </fieldset>
     `;
@@ -156,7 +162,6 @@ export class FlightDashboard extends LitElement {
   };
 
   render() {
-    // console.log('flight-dashboard render', this.currentPlace);
     return html`
       <div style="border: 1px solid blue;  padding: 5px">
         ${this._renderRadioButtons()} ${this._renderHeightAndQueryButtons()}
@@ -170,7 +175,7 @@ export class FlightDashboard extends LitElement {
   _clickIncrementHeight(e) {
     const factor = e.target.id === '--' ? 0.5 : 2.0;
     const place = this.currentPlace;
-    const height = (+place.height) * factor;
+    const height = +place.height * factor;
     place.height = clamp(height, 2000, 32_768_000);
     this.currentPlace = {...place};
     console.log(`FlightDashboard _clickIncrementHeight:`, height);
@@ -189,12 +194,10 @@ export class FlightDashboard extends LitElement {
     this.cameraQuery++;
   }
 
-  // add listener for custom evewnt "cmera-query" from child component
+  // add listener for custom event "cmera-query" from child component
   firstUpdated() {
     this.addEventListener('camera-query', (e) => {
-      // console.log('flight-dashboard camera-query', e.detail, e.detail.height);
       this.currentPlace = {...e.detail};
-    //   this.height = this.currentPlace.height;
     });
   }
 }
