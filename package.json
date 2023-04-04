@@ -23,7 +23,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-proposal-decorators": "^7.19.6",
-    "cesium": "^1.102.0",
+    "cesium": "^1.104.0",
     "vite": "^3.2.0",
     "vite-plugin-babel": "^1.1.2",
     "vite-plugin-cesium": "^1.2.22"

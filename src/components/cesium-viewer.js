@@ -10,11 +10,6 @@ const widgetsCss = css`
   ${unsafeCSS(widgetCssRaw)}
 `;
 
-import creditDisplayCssRaw from './cesium-credit-display.css';
-const creditDisplayCss = css`
-  ${unsafeCSS(creditDisplayCssRaw)}
-`;
-
 // Your access token can be found at: https://cesium.com/ion/tokens.
 Cesium.Ion.defaultAccessToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwMDY5YjNjNy05ZDZjLTQ5YjUtODBhOC03MGY4Njc3MzUyMDEiLCJpZCI6MTEyNTc3LCJpYXQiOjE2NjY4MTYyNjB9.fd9TA4pMsDaKBWE1lSEBvYB34xR-R1anLfSG-vSVI4c';
@@ -99,7 +94,6 @@ export class CesiumViewer extends LitElement {
   static get styles() {
     return [
       widgetsCss,
-      creditDisplayCss,
       css`
         :host {
           display: block; /* no effect */
@@ -185,10 +179,10 @@ export class CesiumViewer extends LitElement {
       homeButton: this.homeButton,
       navigationHelpButton: this.helpButton,
     });
-    this.viewer.camera.moveEnd.addEventListener( () => {
-        console.log(`camera stopped moving`, this);
-        // send custom event to parent
-        this.cameraQuery = -1;
+    this.viewer.camera.moveEnd.addEventListener(() => {
+      console.log(`camera stopped moving`, this);
+      // send custom event to parent
+      this.cameraQuery = -1;
     });
     this.flyTo();
   }
