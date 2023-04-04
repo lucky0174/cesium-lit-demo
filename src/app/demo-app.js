@@ -9,7 +9,7 @@ export class DemoApp extends LitElement {
     <div>
       <fieldset>
         <legend>
-          Prototyping a &lt;cesium-viewer&gt; Lit component v0.1.0
+          Prototyping a &lt;cesium-viewer&gt; Lit component v1.0.0
         </legend>
         <ul>
           <li>component embeds a Cesium.Viewer</li>
@@ -41,7 +41,7 @@ export class DemoApp extends LitElement {
       <div style="border: 1px solid green; margin: 2px; padding: 5px">
         ${this.about}
         <flight-dashboard></flight-dashboard>
-        <!--   
+        <!--
         <cesium-viewer homeButton helpButton></cesium-viewer>
         -->
       </div>
