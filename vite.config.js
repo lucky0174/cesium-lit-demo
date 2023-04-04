@@ -1,25 +1,11 @@
 import {defineConfig} from 'vite';
-import babel from 'vite-plugin-babel';
 import cesium from 'vite-plugin-cesium';
-
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    babel({
-      babelConfig: {
-        babelrc: false,
-        configFile: false,
-        plugins: [
-          ['@babel/plugin-proposal-decorators', {decoratorsBeforeExport: true}],
-          ['@babel/plugin-proposal-class-properties', {loose: true}],
-        ],
-      },
-    }),
-    cesium(),
-  ],
+  plugins: [cesium()],
   build: {
-    // comment-out building the lib, build dist 
+    // comment-out building the lib, build dist
     // lib: {
     //   entry: 'src/my-element.js',
     //   formats: ['es']
