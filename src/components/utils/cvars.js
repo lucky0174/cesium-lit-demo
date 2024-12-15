@@ -1,49 +1,59 @@
 export class CvarLin {
-    #min;
-    #max;
-    #step;
-    #name;
-    #currentValue;
+  #min;
+  #max;
+  #step;
+  #name;
+  #currentValue;
 
-    constructor(min, max, initial, step, name) {
-        this.#min = min;
-        this.#max = max;
-        this.#step = step;
-        this.#name = name;
-        this.#currentValue = initial;
-    }
+  constructor(min, max, initial, step, name) {
+    this.#min = min;
+    this.#max = max;
+    this.#step = step;
+    this.#name = name;
+    this.#currentValue = initial;
+  }
 
-    inc() {
-        if (this.#currentValue + this.#step <= this.#max) {
-            this.#currentValue += this.#step;
-        }
+  inc() {
+    if (this.#currentValue + this.#step <= this.#max) {
+      this.#currentValue += this.#step;
     }
+  }
 
-    dec() {
-        if (this.#currentValue - this.#step >= this.#min) {
-            this.#currentValue -= this.#step;
-        }
+  dec() {
+    if (this.#currentValue - this.#step >= this.#min) {
+      this.#currentValue -= this.#step;
     }
+  }
 
-    value() {
-        return this.#currentValue;
-    }
+  value() {
+    return this.#currentValue;
+  }
 
-    name() {
-        return this.#name;
+  setValue(value) {
+    if (value >= this.#min && value <= this.#max) {
+      this.#currentValue = value;
+    } else {
+      throw new Error(
+        `Value ${value} is out of bounds [${this.#min}, ${this.#max}]`
+      );
     }
+  }
 
-    check() {
-        if (this.#min > this.#max) {
-            throw new Error("min cannot be greater than max");
-        }
-        if (this.#currentValue < this.#min || this.#currentValue > this.#max) {
-          throw new Error('initial value must be between min and max');
-        }
-        if (this.#step <= 0) {
-            throw new Error("step must be a positive number");
-        }
+  name() {
+    return this.#name;
+  }
+
+  check() {
+    if (this.#min > this.#max) {
+      throw new Error('min cannot be greater than max');
     }
+    if (this.#currentValue < this.#min || this.#currentValue > this.#max) {
+      throw new Error('initial value must be between min and max');
+    }
+    if (this.#step <= 0) {
+      throw new Error('step must be a positive number');
+    }
+  }
 }
 
 export class CvarLog {
@@ -75,6 +85,13 @@ export class CvarLog {
 
   value() {
     return this.#currentValue;
+  }
+
+  setValue(value) {
+    if (value < this.#min || value > this.#max) {
+      throw new Error('value must be between min and max');
+    }
+    this.#currentValue = value;
   }
 
   name() {
