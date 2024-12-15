@@ -2,10 +2,11 @@ import {LitElement, html} from 'lit-element';
 
 import './cesium-viewer.js';
 
-import {CvarLin} from './utils/cvars';
+import {CvarLin, CvarLinWrap} from './utils/cvars';
 import './utils/widgets.js'; // Ensure the WidgetIncDec component is imported
 
-const headingCvar = new CvarLin(0, 360, 0, 5, 'Heading');
+const headingCvar = new CvarLinWrap(0, 360, 0, 5, 'Heading');
+const pitchCvar = new CvarLin(-90, 90, 0, 5, 'Pitch');
 
 /**
  * Clamp the value to the range [min, max].
@@ -38,11 +39,18 @@ export class FlightDashboard extends LitElement {
 
     this.currentPlace = this.cameraPlaces[0];
     this.updateHeadingCvar(this.currentPlace.heading);
+    this.updatePitchCvar(this.currentPlace.pitch);
+
     this.cameraQuery = 0;
   }
 
   updateHeadingCvar(heading) {
     headingCvar.setValue(heading);
+    this.requestUpdate();
+  }
+
+  updatePitchCvar(pitch) {
+    pitchCvar.setValue(pitch);
     this.requestUpdate();
   }
 
@@ -53,19 +61,31 @@ export class FlightDashboard extends LitElement {
     });
   }
 
-  // In the updated method, modify the event listener for the widget
+  // In the updated method, modify the event listener for the widgets
   updated(changedProperties) {
     super.updated(changedProperties);
 
-    const widget = this.shadowRoot.querySelector('widget-inc-dec');
-    if (widget) {
-      widget.addEventListener('change', () => {
+    const headingWidget = this.shadowRoot.querySelector('#heading-widget');
+    if (headingWidget) {
+      headingWidget.addEventListener('change', () => {
         this.currentPlace = {
           ...this.currentPlace,
           heading: headingCvar.value(),
         };
         this.requestUpdate();
         console.log('heading changed', this.currentPlace.heading);
+      });
+    }
+
+    const pitchWidget = this.shadowRoot.querySelector('#pitch-widget');
+    if (pitchWidget) {
+      pitchWidget.addEventListener('change', () => {
+        this.currentPlace = {
+          ...this.currentPlace,
+          pitch: pitchCvar.value(),
+        };
+        this.requestUpdate();
+        console.log('pitch changed', this.currentPlace.pitch);
       });
     }
   }
@@ -132,7 +152,12 @@ export class FlightDashboard extends LitElement {
           <span>${this.stringifyPlace(this.currentPlace)}</span>
         </p>
         <p>
-          <widget-inc-dec .cvar=${headingCvar}></widget-inc-dec>
+          <widget-inc-dec
+            id="heading-widget"
+            .cvar=${headingCvar}></widget-inc-dec>
+        </p>
+        <p>
+          <widget-inc-dec id="pitch-widget" .cvar=${pitchCvar}></widget-inc-dec>
         </p>
       </fieldset>
     `;
@@ -184,6 +209,7 @@ export class FlightDashboard extends LitElement {
     console.log('flight-dashboard _onChangePlace:', place);
     this.currentPlace = place;
     this.updateHeadingCvar(place.heading);
+    this.updatePitchCvar(place.pitch);
   }
 
   _clickCameraQuery(e) {
@@ -195,6 +221,8 @@ export class FlightDashboard extends LitElement {
   _handleCameraQuery(event) {
     this.currentPlace = {...event.detail};
     this.updateHeadingCvar(this.currentPlace.heading);
+    this.updatePitchCvar(this.currentPlace.pitch);
+
     this.requestUpdate();
   }
 }

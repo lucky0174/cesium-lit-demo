@@ -56,6 +56,62 @@ export class CvarLin {
   }
 }
 
+export class CvarLinWrap {
+  #min;
+  #max;
+  #step;
+  #name;
+  #currentValue;
+
+  constructor(min, max, initial, step, name) {
+    this.#min = min;
+    this.#max = max;
+    this.#step = step;
+    this.#name = name;
+    this.#currentValue = this.#wrapValue(initial);
+  }
+
+  #wrapValue(value) {
+    const range = this.#max - this.#min;
+    while (value < this.#min) {
+      value += range;
+    }
+    while (value > this.#max) {
+      value -= range;
+    }
+    return value;
+  }
+
+  inc() {
+    this.#currentValue = this.#wrapValue(this.#currentValue + this.#step);
+  }
+
+  dec() {
+    this.#currentValue = this.#wrapValue(this.#currentValue - this.#step);
+  }
+
+  value() {
+    return this.#currentValue;
+  }
+
+  setValue(value) {
+    this.#currentValue = this.#wrapValue(value);
+  }
+
+  name() {
+    return this.#name;
+  }
+
+  check() {
+    if (this.#min >= this.#max) {
+      throw new Error('min must be less than max');
+    }
+    if (this.#step <= 0) {
+      throw new Error('step must be a positive number');
+    }
+  }
+}
+
 export class CvarLog {
   #min;
   #max;
