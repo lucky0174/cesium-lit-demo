@@ -2,26 +2,18 @@ import {LitElement, html} from 'lit-element';
 
 import './cesium-viewer.js';
 
-import {CvarLin, CvarLinWrap} from './utils/cvars';
+import {CvarLin, CvarLinWrap, CvarLog} from './utils/cvars';
 import './utils/widgets.js'; // Ensure the WidgetIncDec component is imported
 
+// Define Cvar instances for each camera parameter
+const lngCvar = new CvarLinWrap(-180, 180, 0, 0.01, 'Longitude');
+const latCvar = new CvarLin(-90, 90, 0, 0.01, 'Latitude');
+const heightCvar = new CvarLog(2000, 4096000, 2000, 1.5, 'Height');
 const headingCvar = new CvarLinWrap(0, 360, 0, 5, 'Heading');
 const pitchCvar = new CvarLin(-90, 90, 0, 5, 'Pitch');
 
-/**
- * Clamp the value to the range [min, max].
- * @param {*} value
- * @param {*} min
- * @param {*} max
- * @returns -- clamped value
- */
-const clamp = (value, min, max) => {
-  if (value < min) return min;
-  if (value > max) return max;
-  return value;
-};
-
 export class FlightDashboard extends LitElement {
+  // Define properties for the component
   static get properties() {
     return {
       cameraQuery: {
@@ -35,66 +27,78 @@ export class FlightDashboard extends LitElement {
 
   constructor() {
     super();
+    // Initialize component state
     this.cameraPlaces = getCameraPlaces();
-
     this.currentPlace = this.cameraPlaces[0];
-    this.updateHeadingCvar(this.currentPlace.heading);
-    this.updatePitchCvar(this.currentPlace.pitch);
+    // Set initial values for Cvars
+    this.updateCvar(lngCvar, this.currentPlace.lngDeg);
+    this.updateCvar(latCvar, this.currentPlace.latDeg);
+    this.updateCvar(heightCvar, this.currentPlace.height);
+    this.updateCvar(headingCvar, this.currentPlace.heading);
+    this.updateCvar(pitchCvar, this.currentPlace.pitch);
 
     this.cameraQuery = 0;
   }
 
-  updateHeadingCvar(heading) {
-    headingCvar.setValue(heading);
+  // Helper method to update Cvar and trigger re-render
+  updateCvar(cvar, value) {
+    cvar.setValue(value);
     this.requestUpdate();
   }
 
-  updatePitchCvar(pitch) {
-    pitchCvar.setValue(pitch);
-    this.requestUpdate();
-  }
-
-  // add listener for custom event "cmera-query" from child component
+  // Lifecycle method: called after first render
   firstUpdated() {
+    // Add listener for custom 'camera-query' event from child component
     this.addEventListener('camera-query', (e) => {
-      this.currentPlace = {...e.detail};
+      const {name} = this.currentPlace;
+      this.currentPlace = {
+        name,
+        ...e.detail,
+      };
     });
   }
 
-  // In the updated method, modify the event listener for the widgets
+  // Lifecycle method: called after each update
   updated(changedProperties) {
     super.updated(changedProperties);
 
-    const headingWidget = this.shadowRoot.querySelector('#heading-widget');
-    if (headingWidget) {
-      headingWidget.addEventListener('change', () => {
-        this.currentPlace = {
-          ...this.currentPlace,
-          heading: headingCvar.value(),
-        };
-        this.requestUpdate();
-        console.log('heading changed', this.currentPlace.heading);
-      });
-    }
+    // Helper function to update currentPlace and trigger re-render
+    const updatePlace = (key, value) => {
+      this.currentPlace = {
+        ...this.currentPlace,
+        [key]: value,
+      };
+      this.requestUpdate();
+      console.log(`${key} changed`, this.currentPlace[key]);
+    };
 
-    const pitchWidget = this.shadowRoot.querySelector('#pitch-widget');
-    if (pitchWidget) {
-      pitchWidget.addEventListener('change', () => {
-        this.currentPlace = {
-          ...this.currentPlace,
-          pitch: pitchCvar.value(),
-        };
-        this.requestUpdate();
-        console.log('pitch changed', this.currentPlace.pitch);
-      });
-    }
+    // Define widget configurations
+    const widgets = [
+      {id: 'lng-widget', key: 'lngDeg', cvar: lngCvar},
+      {id: 'lat-widget', key: 'latDeg', cvar: latCvar},
+      {id: 'height-widget', key: 'height', cvar: heightCvar},
+      {id: 'heading-widget', key: 'heading', cvar: headingCvar},
+      {id: 'pitch-widget', key: 'pitch', cvar: pitchCvar},
+    ];
+
+    // Add event listeners to widgets
+    widgets.forEach(({id, key, cvar}) => {
+      const widget = this.shadowRoot.querySelector(`#${id}`);
+      if (widget) {
+        widget.addEventListener('change', () => {
+          updatePlace(key, cvar.value());
+        });
+      }
+    });
   }
 
-  // formatter for the camera coordinates
-
+  // Formatter for the camera coordinates
   stringifyPlace(place) {
-    return JSON.stringify(place, (key, value) => {
-      if (value.toFixed === undefined) return value;
+    const {name, ...coords} = place;
+    return `${name}: ${JSON.stringify(coords, (key, value) => {
+      if (value.toFixed === undefined) {
+        return value;
+      }
       switch (key) {
         case 'lngDeg':
         case 'latDeg':
@@ -105,11 +109,12 @@ export class FlightDashboard extends LitElement {
         case 'roll':
           return value.toFixed(0);
       }
-    });
+    })}`;
   }
 
-  // render fragments and render
+  // Render methods
 
+  // Render radio buttons for place selection
   _renderRadioButtons = () => {
     return html`
       <fieldset>
@@ -134,35 +139,30 @@ export class FlightDashboard extends LitElement {
     `;
   };
 
+  // Render camera control widgets
   _renderHeightAndQueryButtons = () => {
     return html`
       <fieldset>
-        <legend>Height</legend>
-        <button id="--" @click=${this._clickIncrementHeight} part="button">
-          --
-        </button>
-        <button id="++" @click=${this._clickIncrementHeight} part="button">
-          ++
-        </button>
-        &nbsp; ${(+this.currentPlace.height).toFixed(0)} m
-        <p>
-          <button id="?" @click=${this._clickCameraQuery} part="button">
-            ?
-          </button>
-          <span>${this.stringifyPlace(this.currentPlace)}</span>
-        </p>
-        <p>
+        <legend>Camera Controls</legend>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px 10px;">
+          <widget-inc-dec id="lng-widget" .cvar=${lngCvar}></widget-inc-dec>
+          <widget-inc-dec id="lat-widget" .cvar=${latCvar}></widget-inc-dec>
+          <widget-inc-dec
+            id="height-widget"
+            .cvar=${heightCvar}></widget-inc-dec>
           <widget-inc-dec
             id="heading-widget"
             .cvar=${headingCvar}></widget-inc-dec>
-        </p>
-        <p>
           <widget-inc-dec id="pitch-widget" .cvar=${pitchCvar}></widget-inc-dec>
+        </div>
+        <p>
+          <span>${this.stringifyPlace(this.currentPlace)}</span>
         </p>
       </fieldset>
     `;
   };
 
+  // Render Cesium viewer component
   _renderCesiumViewer = () => {
     console.log('_renderCesiumViewer', this.currentPlace.heading);
 
@@ -181,6 +181,7 @@ export class FlightDashboard extends LitElement {
     `;
   };
 
+  // Main render method
   render() {
     return html`
       <div style="border: 1px solid blue;  padding: 5px">
@@ -190,43 +191,42 @@ export class FlightDashboard extends LitElement {
     `;
   }
 
-  // listeners
+  // Event handlers
 
-  _clickIncrementHeight(e) {
-    const factor = e.target.id === '--' ? 0.5 : 2.0;
-    const place = this.currentPlace;
-    const height = +place.height * factor;
-    place.height = clamp(height, 2000, 32_768_000);
-    this.currentPlace = {...place};
-    console.log(`FlightDashboard _clickIncrementHeight:`, height);
-  }
-
-  // Modify the _onChangePlace method to update headingCvar
+  // Handle place change from radio buttons
   _onChangePlace(e) {
-    const place = this.cameraPlaces.find(
-      (place) => place.name === e.target.value
-    );
+    const place = this.cameraPlaces.find(place => place.name === e.target.value);
     console.log('flight-dashboard _onChangePlace:', place);
-    this.currentPlace = place;
-    this.updateHeadingCvar(place.heading);
-    this.updatePitchCvar(place.pitch);
-  }
-
-  _clickCameraQuery(e) {
-    // increment cameraQuery to trigger a readout of the camera position
-    this.cameraQuery++;
-  }
-
-  // Modify the _handleCameraQuery method to update headingCvar
-  _handleCameraQuery(event) {
-    this.currentPlace = {...event.detail};
-    this.updateHeadingCvar(this.currentPlace.heading);
-    this.updatePitchCvar(this.currentPlace.pitch);
-
+    this.currentPlace = {...place};
+    this._updateAllCvars();
     this.requestUpdate();
+  }
+
+  // Handle camera query event from Cesium viewer
+  _handleCameraQuery(event) {
+    const {name} = this.currentPlace;
+    this.currentPlace = {
+      name,
+      ...event.detail,
+    };
+    this._updateAllCvars();
+    this.requestUpdate();
+  }
+
+  // Update all Cvars based on current place
+  _updateAllCvars() {
+    const cvars = [
+      {cvar: lngCvar, key: 'lngDeg'},
+      {cvar: latCvar, key: 'latDeg'},
+      {cvar: heightCvar, key: 'height'},
+      {cvar: headingCvar, key: 'heading'},
+      {cvar: pitchCvar, key: 'pitch'},
+    ];
+    cvars.forEach(({cvar, key}) => this.updateCvar(cvar, this.currentPlace[key]));
   }
 }
 
+// Helper function to get predefined camera places
 function getCameraPlaces() {
   return [
     {

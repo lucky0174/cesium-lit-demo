@@ -1,10 +1,16 @@
-import { LitElement, html, css } from 'lit';
+import {LitElement, html, css} from 'lit';
 
+/**
+ * WidgetIncDec - A custom Lit element for incrementing and decrementing a value.
+ * This widget displays a value with increment and decrement buttons.
+ */
 class WidgetIncDec extends LitElement {
+  // Define the properties for this element
   static properties = {
-    cvar: {type: Object},
+    cvar: {type: Object}, // The control variable object
   };
 
+  // Define the CSS styles for this element
   static styles = css`
     .widget {
       display: inline-flex;
@@ -14,11 +20,12 @@ class WidgetIncDec extends LitElement {
       padding: 5px;
       max-width: 250px;
       margin: 0 auto;
+      background-color: #f0f0f0;
     }
     .value {
       margin: 0 5px;
       font-family: monospace;
-      font-size: 1.2em;
+      font-size: 1.3em;
       min-width: 60px;
       text-align: right;
     }
@@ -34,9 +41,13 @@ class WidgetIncDec extends LitElement {
 
   constructor() {
     super();
-    this.cvar = null;
+    this.cvar = null; // Initialize cvar to null
   }
 
+  /**
+   * Render the widget
+   * @returns {TemplateResult} The HTML template for the widget
+   */
   render() {
     return html`
       <div class="widget">
@@ -48,6 +59,11 @@ class WidgetIncDec extends LitElement {
     `;
   }
 
+  /**
+   * Format the value for display
+   * @param {number} value - The value to format
+   * @returns {string} The formatted value as a string
+   */
   _formatValue(value) {
     if (typeof value !== 'number') {
       return value.toString().padStart(5, ' ');
@@ -56,10 +72,7 @@ class WidgetIncDec extends LitElement {
     const absValue = Math.abs(value);
     let formattedValue;
 
-    if (absValue >= 10000 || (absValue < 0.001 && absValue !== 0)) {
-      // Use scientific notation for very large or very small numbers
-      formattedValue = value.toExponential(2);
-    } else if (Number.isInteger(value)) {
+    if (Number.isInteger(value)) {
       // For integers, use fixed-point notation
       formattedValue = value.toFixed(0);
     } else {
@@ -74,18 +87,31 @@ class WidgetIncDec extends LitElement {
     // Ensure the string is exactly 5 characters long
     return formattedValue.padStart(5, ' ');
   }
+
+  /**
+   * Increment the value
+   * @private
+   */
   _inc() {
     this.cvar.inc();
     this.requestUpdate();
     this._emitChangeEvent();
   }
 
+  /**
+   * Decrement the value
+   * @private
+   */
   _dec() {
     this.cvar.dec();
     this.requestUpdate();
     this._emitChangeEvent();
   }
 
+  /**
+   * Emit a change event with the new value
+   * @private
+   */
   _emitChangeEvent() {
     console.log('change event emitted', this.cvar.value());
     this.dispatchEvent(
@@ -96,4 +122,5 @@ class WidgetIncDec extends LitElement {
   }
 }
 
+// Register the custom element
 customElements.define('widget-inc-dec', WidgetIncDec);
