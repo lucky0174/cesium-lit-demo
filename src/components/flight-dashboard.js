@@ -8,10 +8,22 @@ import './utils/widgets.js'; // Ensure the WidgetIncDec component is imported
 // Define Cvar instances for each camera parameter
 const lngCvar = new CvarLinWrap(-180, 180, 0, 0.01, 'Longitude');
 const latCvar = new CvarLin(-90, 90, 0, 0.01, 'Latitude');
-const heightCvar = new CvarLog(2000, 4096000, 2000, 1.5, 'Height');
+const heightCvar = new CvarLog(200, 4096000, 2000, 1.5, 'Height');
 const headingCvar = new CvarLinWrap(0, 360, 0, 5, 'Heading');
 const pitchCvar = new CvarLin(-90, 90, 0, 5, 'Pitch');
 
+/**
+ * @class FlightDashboard
+ * @extends {LitElement}
+ * @description A custom element that provides a dashboard for controlling a Cesium viewer's camera.
+ * It allows users to select predefined places, adjust camera parameters, and interact with a Cesium viewer.
+ *
+ * @property {Number} cameraQuery - A trigger for querying the camera's current position.
+ * @property {Object} currentPlace - The currently selected or set place, containing camera coordinates and settings.
+ *
+ * @fires camera-query - Fired when the camera position is queried.
+ * @listens camera-query - Listens for camera position updates from the Cesium viewer.
+ */
 export class FlightDashboard extends LitElement {
   // Define properties for the component
   static get properties() {
@@ -31,18 +43,22 @@ export class FlightDashboard extends LitElement {
     this.cameraPlaces = getCameraPlaces();
     this.currentPlace = this.cameraPlaces[0];
     // Set initial values for Cvars
-    this.updateCvar(lngCvar, this.currentPlace.lngDeg);
-    this.updateCvar(latCvar, this.currentPlace.latDeg);
-    this.updateCvar(heightCvar, this.currentPlace.height);
-    this.updateCvar(headingCvar, this.currentPlace.heading);
-    this.updateCvar(pitchCvar, this.currentPlace.pitch);
+    this._updateAllCvars();
 
     this.cameraQuery = 0;
   }
 
-  // Helper method to update Cvar and trigger re-render
-  updateCvar(cvar, value) {
-    cvar.setValue(value);
+  // Update all Cvars based on currentPlace and its keys
+  _updateAllCvars() {
+    console.log('_updateAllCvars', this.currentPlace);
+    const cvars = [
+      {cvar: lngCvar, key: 'lngDeg'},
+      {cvar: latCvar, key: 'latDeg'},
+      {cvar: heightCvar, key: 'height'},
+      {cvar: headingCvar, key: 'heading'},
+      {cvar: pitchCvar, key: 'pitch'},
+    ];
+    cvars.forEach(({cvar, key}) => cvar.setValue(this.currentPlace[key]));
     this.requestUpdate();
   }
 
@@ -92,27 +108,48 @@ export class FlightDashboard extends LitElement {
     });
   }
 
-  // Formatter for the camera coordinates
-  stringifyPlace(place) {
-    const {name, ...coords} = place;
-    return `${name}: ${JSON.stringify(coords, (key, value) => {
-      if (value.toFixed === undefined) {
-        return value;
-      }
-      switch (key) {
-        case 'lngDeg':
-        case 'latDeg':
-          return value.toFixed(6);
-        case 'height':
-        case 'heading':
-        case 'pitch':
-        case 'roll':
-          return value.toFixed(0);
-      }
-    })}`;
-  }
-
   // Render methods
+
+  // Render the camera coordinates
+  _renderPlace(place) {
+    // replace 'name' with the actual place name
+    let {name, ...coords} = place;
+    coords = {[name]: '', ...coords};
+    let maxKeyLength = Math.max(
+      ...Object.keys(coords).map((key) => key.length)
+    );
+    maxKeyLength = Math.max(maxKeyLength, name.length);
+
+    const formattedCoords = Object.entries(coords).map(
+      ([key, value], index) => {
+        let formattedValue = value;
+        if (typeof value === 'number') {
+          switch (key) {
+            case 'lngDeg':
+            case 'latDeg':
+              formattedValue = value.toFixed(6);
+              break;
+            case 'height':
+            case 'heading':
+            case 'pitch':
+            case 'roll':
+              formattedValue = value.toFixed(0);
+              break;
+          }
+        }
+        const paddedKey = key.padStart(maxKeyLength, '\u00A0');
+        if (index === 0) {
+          return html`<div><strong>${paddedKey}</strong></div>`;
+        }
+        return html`<div>${paddedKey} : ${formattedValue}</div>`;
+      }
+    );
+    return html`
+      <div style="font-family: monospace; font-size: 1.4em; white-space: pre;">
+        ${formattedCoords}
+      </div>
+    `;
+  }
 
   // Render radio buttons for place selection
   _renderRadioButtons = () => {
@@ -130,7 +167,7 @@ export class FlightDashboard extends LitElement {
                 value="${option.name}"
                 ?checked=${option.name === this.cameraPlaces[0].name}
                 @change=${this._onChangePlace} />
-              <label class="form-check-label">${JSON.stringify(option)}</label>
+              <label class="form-check-label">${option.name}</label>
               <br />
             `
           )}
@@ -140,11 +177,12 @@ export class FlightDashboard extends LitElement {
   };
 
   // Render camera control widgets
-  _renderHeightAndQueryButtons = () => {
+  _renderCameraControlWidgets = () => {
+    console.log('_renderCameraControlWidgets', this.currentPlace);
     return html`
       <fieldset>
         <legend>Camera Controls</legend>
-        <div style="display: flex; flex-wrap: wrap; gap: 5px 10px;">
+        <div>
           <widget-inc-dec id="lng-widget" .cvar=${lngCvar}></widget-inc-dec>
           <widget-inc-dec id="lat-widget" .cvar=${latCvar}></widget-inc-dec>
           <widget-inc-dec
@@ -156,7 +194,7 @@ export class FlightDashboard extends LitElement {
           <widget-inc-dec id="pitch-widget" .cvar=${pitchCvar}></widget-inc-dec>
         </div>
         <p>
-          <span>${this.stringifyPlace(this.currentPlace)}</span>
+          <span>${this._renderPlace(this.currentPlace)}</span>
         </p>
       </fieldset>
     `;
@@ -164,7 +202,7 @@ export class FlightDashboard extends LitElement {
 
   // Render Cesium viewer component
   _renderCesiumViewer = () => {
-    console.log('_renderCesiumViewer', this.currentPlace.heading);
+    // console.log('_renderCesiumViewer', this.currentPlace.heading);
 
     return html`
       <div style="border: 1px solid blue; ">
@@ -185,7 +223,7 @@ export class FlightDashboard extends LitElement {
   render() {
     return html`
       <div style="border: 1px solid blue;  padding: 5px">
-        ${this._renderRadioButtons()} ${this._renderHeightAndQueryButtons()}
+        ${this._renderRadioButtons()} ${this._renderCameraControlWidgets()}
         ${this._renderCesiumViewer()}
       </div>
     `;
@@ -195,11 +233,12 @@ export class FlightDashboard extends LitElement {
 
   // Handle place change from radio buttons
   _onChangePlace(e) {
-    const place = this.cameraPlaces.find(place => place.name === e.target.value);
+    const place = this.cameraPlaces.find(
+      (place) => place.name === e.target.value
+    );
     console.log('flight-dashboard _onChangePlace:', place);
     this.currentPlace = {...place};
     this._updateAllCvars();
-    this.requestUpdate();
   }
 
   // Handle camera query event from Cesium viewer
@@ -210,19 +249,6 @@ export class FlightDashboard extends LitElement {
       ...event.detail,
     };
     this._updateAllCvars();
-    this.requestUpdate();
-  }
-
-  // Update all Cvars based on current place
-  _updateAllCvars() {
-    const cvars = [
-      {cvar: lngCvar, key: 'lngDeg'},
-      {cvar: latCvar, key: 'latDeg'},
-      {cvar: heightCvar, key: 'height'},
-      {cvar: headingCvar, key: 'heading'},
-      {cvar: pitchCvar, key: 'pitch'},
-    ];
-    cvars.forEach(({cvar, key}) => this.updateCvar(cvar, this.currentPlace[key]));
   }
 }
 

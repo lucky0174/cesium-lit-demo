@@ -44,7 +44,7 @@ class CameraCoordinates {
 
   // update this from an object specifying some or all of the properties
   update(obj) {
-    console.log(`CameraCoordinates update:`, obj);
+    // console.log(`CameraCoordinates update:`, obj);
     this.lngDeg = obj.lngDeg ?? this.lngDeg;
     this.latDeg = obj.latDeg ?? this.latDeg;
     this.height = obj.height ?? this.height;
