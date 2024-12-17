@@ -25,6 +25,7 @@ class WidgetIncDec extends LitElement {
       margin: 0 auto;
       background-color: #f0f0f0;
     }
+
     .value {
       margin: 0 5px;
       font-family: monospace;
@@ -32,11 +33,7 @@ class WidgetIncDec extends LitElement {
       min-width: 60px;
       text-align: right;
     }
-    button {
-      padding: 2px 6px;
-      margin: 0 2px;
-      font-size: 1em;
-    }
+
     .name {
       margin-right: 5px;
     }
@@ -44,7 +41,8 @@ class WidgetIncDec extends LitElement {
     button {
       padding: 2px 6px;
       margin: 0 2px;
-      font-size: 1em;
+      font-size: 1.4em;
+      font-family: monospace;
       transition: background-color 0.3s;
     }
 
@@ -67,7 +65,9 @@ class WidgetIncDec extends LitElement {
     this._decrementing = false;
   }
 
-  updated(changedProperties) {}
+  updated(changedProperties) {
+    super.updated(changedProperties);
+  }
 
   actionDone() {
     this._incrementing = false;
@@ -153,7 +153,7 @@ class WidgetIncDec extends LitElement {
    * @private
    */
   _emitChangeEvent() {
-    console.log('change event emitted', this.cvar.value());
+    // console.log('change event emitted', this.cvar.value());
     this.dispatchEvent(
       new CustomEvent('change', {
         detail: {value: this.cvar.value()},

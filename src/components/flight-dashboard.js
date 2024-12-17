@@ -33,7 +33,6 @@ export class FlightDashboard extends LitElement {
       currentPlace: {
         type: Object,
       },
-      _cameraMoving: {type: Boolean, state: true},
     };
   }
 
@@ -42,7 +41,6 @@ export class FlightDashboard extends LitElement {
     // Initialize component state
     this.cameraPlaces = getCameraPlaces();
     this.currentPlace = this.cameraPlaces[0];
-    this._cameraMoving = false;
 
     // Set initial values for Cvars
     this._updateAllCvars();
@@ -87,7 +85,7 @@ export class FlightDashboard extends LitElement {
       if (widget) {
         widget.addEventListener('change', () => {
           updatePlace(key, cvar.value());
-          console.log(`updated ${key}`);
+          //   console.log(`updated ${key}`);
         });
       }
     });
@@ -96,10 +94,6 @@ export class FlightDashboard extends LitElement {
   // Lifecycle method: called after each update
   updated(changedProperties) {
     super.updated(changedProperties);
-    if (changedProperties.has('_cameraMoving') && this._cameraMoving) {
-      // Reset _cameraMoving to false after passing it to the widgets
-      this._cameraMoving = false;
-    }
   }
 
   // Render methods
@@ -252,14 +246,21 @@ export class FlightDashboard extends LitElement {
 
   // Handle camera-coords event from Cesium viewer
   _handleCameraStopped(event) {
-    console.log('_handleCameraStopped', event.detail);
+    // console.log('_handleCameraStopped', event.detail);
     const {name} = this.currentPlace;
     this.currentPlace = {
       name,
       ...event.detail,
     };
-    this._cameraMoving = false;
+    this._tellWidgetsDone();
     this._updateAllCvars(); // calls  this.requestUpdate();
+  }
+
+  // Helper function to tell widgets that the camera coordinates have been updated
+  _tellWidgetsDone() {
+    // find widgets and call .actionDone() on them
+    const widgets = this.shadowRoot.querySelectorAll('widget-inc-dec');
+    widgets.forEach((widget) => widget.actionDone());
   }
 }
 

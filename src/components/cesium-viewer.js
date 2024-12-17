@@ -135,10 +135,10 @@ export class CesiumViewer extends LitElement {
     let oldVal = this._height;
     this._height = val;
     this.requestUpdate('height', oldVal);
-    console.log(
-      `--- set height: ${val}`,
-      `cameraCoordinates: ${this.cameraCoordinates}`
-    );
+    // console.log(
+    //   `--- set height: ${val}`,
+    //   `cameraCoordinates: ${this.cameraCoordinates}`
+    // );
 
     this.cameraCoordinates?.setHeight(this.height);
     this.cameraCoordinates?.flyTo(this.viewer);
