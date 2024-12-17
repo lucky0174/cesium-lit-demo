@@ -9,7 +9,7 @@ export class DemoApp extends LitElement {
     <div>
       <fieldset>
         <legend>
-          Prototyping a &lt;cesium-viewer&gt; Lit component v1.0.0
+          Prototyping a &lt;cesium-viewer&gt; Lit component v1.1.1
         </legend>
         <ul>
           <li>component embeds a Cesium.Viewer</li>

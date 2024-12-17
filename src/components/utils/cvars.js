@@ -69,7 +69,9 @@ export class CvarLin {
       throw new Error('min cannot be greater than max');
     }
     if (this.#currentValue < this.#min || this.#currentValue > this.#max) {
-      throw new Error('initial value must be between min and max');
+         throw new Error(
+           `initial value ${value} must be between ${min} and ${max}`
+         );
     }
     if (this.#step <= 0) {
       throw new Error('step must be a positive number');
@@ -211,7 +213,9 @@ export class CvarLog {
    */
   setValue(value) {
     if (value < this.#min || value > this.#max) {
-      throw new Error('value must be between min and max');
+      throw new Error(
+        `initial value ${value} must be between ${this.#min} and ${this.#max}`
+      );
     }
     this.#currentValue = value;
   }

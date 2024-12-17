@@ -44,7 +44,7 @@ class CameraCoordinates {
 
   // update this from an object specifying some or all of the properties
   update(obj) {
-    console.log(`CameraCoordinates update:`, obj);
+    // console.log(`CameraCoordinates update:`, obj);
     this.lngDeg = obj.lngDeg ?? this.lngDeg;
     this.latDeg = obj.latDeg ?? this.latDeg;
     this.height = obj.height ?? this.height;
@@ -120,7 +120,6 @@ export class CesiumViewer extends LitElement {
       homeButton: {type: Boolean},
       helpButton: {type: Boolean},
       height: {type: Number},
-      cameraQuery: {type: Number},
     };
   }
 
@@ -130,17 +129,16 @@ export class CesiumViewer extends LitElement {
     this.homeButton = false;
     this.helpButton = false;
     this.height = 1000000;
-    this.cameraQuery = 0;
   }
 
   set height(val) {
     let oldVal = this._height;
     this._height = val;
     this.requestUpdate('height', oldVal);
-    console.log(
-      `--- set height: ${val}`,
-      `cameraCoordinates: ${this.cameraCoordinates}`
-    );
+    // console.log(
+    //   `--- set height: ${val}`,
+    //   `cameraCoordinates: ${this.cameraCoordinates}`
+    // );
 
     this.cameraCoordinates?.setHeight(this.height);
     this.cameraCoordinates?.flyTo(this.viewer);
@@ -149,12 +147,15 @@ export class CesiumViewer extends LitElement {
     return this._height;
   }
 
-  set cameraQuery(val) {
+  _dispatchCameraCoordinates() {
     // get camera coordinates and send them to the parent via the event
     const coords = CameraCoordinates.from(this.viewer?.camera);
-    // console.log(`--- cameraQuery: ${val}`, `cameraCoordinates:`, coords);
+    // console.log(`--- _dispatchCameraCoordinates: ${val}`, `cameraCoordinates:`, coords);
+    if (!coords) {
+      return;
+    }
     this.dispatchEvent(
-      new CustomEvent('camera-query', {
+      new CustomEvent('camera-coords', {
         detail: coords,
         bubbles: true,
         composed: true,
@@ -180,9 +181,9 @@ export class CesiumViewer extends LitElement {
       navigationHelpButton: this.helpButton,
     });
     this.viewer.camera.moveEnd.addEventListener(() => {
-      console.log(`camera stopped moving`, this);
+      // console.log(`camera stopped moving`, this);
       // send custom event to parent
-      this.cameraQuery = -1;
+      this._dispatchCameraCoordinates();
     });
     this.flyTo();
   }
