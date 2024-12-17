@@ -182,7 +182,7 @@ export class CesiumViewer extends LitElement {
       navigationHelpButton: this.helpButton,
     });
     this.viewer.camera.moveEnd.addEventListener(() => {
-      console.log(`camera stopped moving`, this);
+      // console.log(`camera stopped moving`, this);
       // send custom event to parent
       this._dispatchCameraCoordinates();
     });
