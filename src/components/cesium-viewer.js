@@ -120,7 +120,7 @@ export class CesiumViewer extends LitElement {
       homeButton: {type: Boolean},
       helpButton: {type: Boolean},
       height: {type: Number},
-      cameraQuery: {type: Number},
+      //   cameraQuery: {type: Number},
     };
   }
 
@@ -130,7 +130,6 @@ export class CesiumViewer extends LitElement {
     this.homeButton = false;
     this.helpButton = false;
     this.height = 1000000;
-    this.cameraQuery = 0;
   }
 
   set height(val) {
@@ -149,12 +148,15 @@ export class CesiumViewer extends LitElement {
     return this._height;
   }
 
-  set cameraQuery(val) {
+  _dispatchCameraCoordinates() {
     // get camera coordinates and send them to the parent via the event
     const coords = CameraCoordinates.from(this.viewer?.camera);
     // console.log(`--- cameraQuery: ${val}`, `cameraCoordinates:`, coords);
+    if (!coords) {
+      return;
+    }
     this.dispatchEvent(
-      new CustomEvent('camera-query', {
+      new CustomEvent('camera-coords', {
         detail: coords,
         bubbles: true,
         composed: true,
@@ -182,7 +184,7 @@ export class CesiumViewer extends LitElement {
     this.viewer.camera.moveEnd.addEventListener(() => {
       console.log(`camera stopped moving`, this);
       // send custom event to parent
-      this.cameraQuery = -1;
+      this._dispatchCameraCoordinates();
     });
     this.flyTo();
   }

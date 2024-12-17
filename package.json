@@ -1,28 +1,28 @@
 {
-  "name": "cesium-lit-demo",
-  "version": "1.0.0",
-  "authors": [
-    "Cesium",
-    "Vite",
-    "Lit",
-    "Rudolf Farkas @rudifa",
-    "Olivier Lange @olange"
-  ],
-  "private": false,
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "lit": "^2.4.0"
-  },
-  "devDependencies": {
-    "cesium": "^1.104.0",
-    "vite": "^3.2.0",
-    "vite-plugin-cesium": "^1.2.22"
-  }
+    "name": "cesium-lit-demo",
+    "version": "1.1.0",
+    "authors": [
+        "Cesium",
+        "Vite",
+        "Lit",
+        "Rudolf Farkas @rudifa",
+        "Olivier Lange @olange"
+    ],
+    "private": false,
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "lit": "^2.4.0"
+    },
+    "devDependencies": {
+        "cesium": "^1.104.0",
+        "vite": "^3.2.0",
+        "vite-plugin-cesium": "^1.2.22"
+    }
 }

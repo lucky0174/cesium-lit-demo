@@ -8,6 +8,7 @@ class WidgetIncDec extends LitElement {
   // Define the properties for this element
   static properties = {
     cvar: {type: Object}, // The control variable object
+    value: {type: String}, // A scalar property change triggers a re-Render
   };
 
   // Define the CSS styles for this element
