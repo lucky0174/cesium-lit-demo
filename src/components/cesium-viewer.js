@@ -120,7 +120,6 @@ export class CesiumViewer extends LitElement {
       homeButton: {type: Boolean},
       helpButton: {type: Boolean},
       height: {type: Number},
-      //   cameraQuery: {type: Number},
     };
   }
 
@@ -151,7 +150,7 @@ export class CesiumViewer extends LitElement {
   _dispatchCameraCoordinates() {
     // get camera coordinates and send them to the parent via the event
     const coords = CameraCoordinates.from(this.viewer?.camera);
-    // console.log(`--- cameraQuery: ${val}`, `cameraCoordinates:`, coords);
+    // console.log(`--- _dispatchCameraCoordinates: ${val}`, `cameraCoordinates:`, coords);
     if (!coords) {
       return;
     }

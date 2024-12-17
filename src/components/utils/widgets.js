@@ -7,8 +7,10 @@ import {LitElement, html, css} from 'lit';
 class WidgetIncDec extends LitElement {
   // Define the properties for this element
   static properties = {
-    cvar: {type: Object}, // The control variable object
-    value: {type: String}, // A scalar property change triggers a re-Render
+    cvar: {type: Object},
+    value: {type: String},
+    _incrementing: {type: Boolean, state: true}, // Private state property
+    _decrementing: {type: Boolean, state: true}, // Private state property
   };
 
   // Define the CSS styles for this element
@@ -38,11 +40,38 @@ class WidgetIncDec extends LitElement {
     .name {
       margin-right: 5px;
     }
+
+    button {
+      padding: 2px 6px;
+      margin: 0 2px;
+      font-size: 1em;
+      transition: background-color 0.3s;
+    }
+
+    button.green {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    button.orange {
+      background-color: #ff9800;
+      color: white;
+    }
   `;
 
   constructor() {
     super();
-    this.cvar = null; // Initialize cvar to null
+    this.cvar = null;
+    this.done = true;
+    this._incrementing = false;
+    this._decrementing = false;
+  }
+
+  updated(changedProperties) {}
+
+  actionDone() {
+    this._incrementing = false;
+    this._decrementing = false;
   }
 
   /**
@@ -53,9 +82,17 @@ class WidgetIncDec extends LitElement {
     return html`
       <div class="widget">
         <span>${this.cvar.name()}</span>&nbsp;
-        <button @click="${this._dec}">-</button>&nbsp;
+        <button
+          @click="${this._dec}"
+          class="${this._decrementing ? 'orange' : 'green'}">
+          -</button
+        >&nbsp;
         <span class="value">${this._formatValue(this.cvar.value())}</span>
-        <button @click="${this._inc}">+</button>
+        <button
+          @click="${this._inc}"
+          class="${this._incrementing ? 'orange' : 'green'}">
+          +
+        </button>
       </div>
     `;
   }
@@ -94,6 +131,7 @@ class WidgetIncDec extends LitElement {
    * @private
    */
   _inc() {
+    this._incrementing = true;
     this.cvar.inc();
     this.requestUpdate();
     this._emitChangeEvent();
@@ -104,6 +142,7 @@ class WidgetIncDec extends LitElement {
    * @private
    */
   _dec() {
+    this._decrementing = true;
     this.cvar.dec();
     this.requestUpdate();
     this._emitChangeEvent();

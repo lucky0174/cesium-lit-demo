@@ -33,6 +33,7 @@ export class FlightDashboard extends LitElement {
       currentPlace: {
         type: Object,
       },
+      _cameraMoving: {type: Boolean, state: true},
     };
   }
 
@@ -41,6 +42,8 @@ export class FlightDashboard extends LitElement {
     // Initialize component state
     this.cameraPlaces = getCameraPlaces();
     this.currentPlace = this.cameraPlaces[0];
+    this._cameraMoving = false;
+
     // Set initial values for Cvars
     this._updateAllCvars();
   }
@@ -93,6 +96,10 @@ export class FlightDashboard extends LitElement {
   // Lifecycle method: called after each update
   updated(changedProperties) {
     super.updated(changedProperties);
+    if (changedProperties.has('_cameraMoving') && this._cameraMoving) {
+      // Reset _cameraMoving to false after passing it to the widgets
+      this._cameraMoving = false;
+    }
   }
 
   // Render methods
@@ -134,19 +141,23 @@ export class FlightDashboard extends LitElement {
             id="lng-widget"
             .cvar=${lngCvar}
             value=${lngCvar.value()}></widget-inc-dec>
+
           <widget-inc-dec
             id="lat-widget"
             .cvar=${latCvar}
             value=${latCvar.value()}>
           </widget-inc-dec>
+
           <widget-inc-dec
             id="height-widget"
             .cvar=${heightCvar}
             value=${heightCvar.value()}></widget-inc-dec>
+
           <widget-inc-dec
             id="heading-widget"
             .cvar=${headingCvar}
             value=${headingCvar.value()}></widget-inc-dec>
+
           <widget-inc-dec
             id="pitch-widget"
             .cvar=${pitchCvar}
@@ -212,7 +223,7 @@ export class FlightDashboard extends LitElement {
         </p>
         <cesium-viewer
           .cameraCoords=${this.currentPlace}
-          @camera-coords=${this._handleCameraQuery}>
+          @camera-coords=${this._handleCameraStopped}>
         </cesium-viewer>
       </div>
     `;
@@ -239,15 +250,16 @@ export class FlightDashboard extends LitElement {
     this._updateAllCvars();
   }
 
-  // Handle camera query event from Cesium viewer
-  _handleCameraQuery(event) {
-    // console.log('_handleCameraQuery', event.detail);
+  // Handle camera-coords event from Cesium viewer
+  _handleCameraStopped(event) {
+    console.log('_handleCameraStopped', event.detail);
     const {name} = this.currentPlace;
     this.currentPlace = {
       name,
       ...event.detail,
     };
-    this._updateAllCvars();
+    this._cameraMoving = false;
+    this._updateAllCvars(); // calls  this.requestUpdate();
   }
 }
 
